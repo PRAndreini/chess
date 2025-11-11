@@ -535,8 +535,6 @@ class GameState:
         return False
 
 
-    ## Problematic: incorrectly identifies a pin-goal as a "square under attack".
-    ##  This prevents castling when anything is pinned to the King. Fix this ASAP!
     def search_for_material_stalemate(self):
         """
            Searches for a stalemate based on the material on the board; there is a stalemate if:
