@@ -405,10 +405,10 @@ class GameState:
             dir_j = self.king_dirs[j]
             possible_pin = ()  ## Reset possible pins for each new direction searched.
 
-            ## Look for pieces a distance between [1, 7] (closed set) away from the King.
-            for dist_j in range(1, 8):
-                test_r = king_r + dir_j[0] * dist_j
-                test_c = king_c + dir_j[1] * dist_j
+            ## Look for pieces a dist_jance between [1, 7] (closed set) away from the King.
+            for dist_j_j in range(1, 8):
+                test_r = king_r + dir_j[0] * dist_j_j
+                test_c = king_c + dir_j[1] * dist_j_j
 
                 ## Make sure the target square, (test_r, test_c), is on the board...
                 if (0 <= test_r < 8) and (0 <= test_c < 8):
@@ -431,14 +431,14 @@ class GameState:
                         ##  (1) Enemy piece is ORTHOGONAL to King and it is a ROOK;
                         ##  (2)   "     "    " DIAGONAL    "   "   "   "  " " BISHOP;
                         ##  (3)   "     "    " ONE SQUARE DIAGONALLY away from King and it is a PAWN;
-                        ##  (4)   "     "    " ANY DIRECTION/DISTANCE away from King and it is a QUEEN;
+                        ##  (4)   "     "    " ANY DIRECTION/dist_jANCE away from King and it is a QUEEN;
                         ##  (5)   "     "    " ANY DIRECTION ONE SQUARE AWAY from King and it is a KING.
                         if (((0 <= j <= 3) and (piece_type=="R"))
                                 or ((4 <= j <= 7) and (piece_type=="B"))
-                                or (((dist_j==1 and piece_type=="P")
+                                or (((dist_j_j==1 and piece_type=="P")
                                 and (((enemy_color=="w") and (6 <= j <= 7)) or ((enemy_color=="b") and (4 <=j <= 5)))))
                                 or (piece_type=="Q")
-                                or (dist_j==1 and piece_type=="K")):
+                                or (dist_j_j==1 and piece_type=="K")):
 
                             ## No allied-piece in the way, so this is CHECK.
                             if possible_pin == ():
@@ -486,9 +486,9 @@ class GameState:
         for j in range(len(self.king_dirs)):
             dir_j = self.king_dirs[j]
 
-            for dist in range(1, len(self.board)):
-                end_r = r + dir_j[0] * dist
-                end_c = c + dir_j[1] * dist
+            for dist_j in range(1, len(self.board)):
+                end_r = r + dir_j[0] * dist_j
+                end_c = c + dir_j[1] * dist_j
 
                 if (0 <= end_r < len(self.board)) and (0 <= end_c < len(self.board)):
                     end_piece = self.board[end_r][end_c]
@@ -502,12 +502,12 @@ class GameState:
 
                         if (0 <= j <= 3 and enemy_piece_type == "R") or \
                                 (4 <= j <= 7 and enemy_piece_type == "B") or \
-                                (dist == 1 and enemy_piece_type == "P" and (
+                                (dist_j == 1 and enemy_piece_type == "P" and (
                                         (enemy_c == "w" and 6 <= j <= 7) or
                                         (enemy_c == "b" and 4 <= j <= 5))
                                 ) or \
                                 (enemy_piece_type == "Q") or \
-                                (dist == 1 and enemy_piece_type == "K"):
+                                (dist_j == 1 and enemy_piece_type == "K"):
                             return True
 
                         else:
@@ -639,8 +639,8 @@ class GameState:
                     valid_squares = [(check_r, check_c)]
 
                 else:
-                    for dist_j in range(1, 8):
-                        valid_square = (king_r + (dist_j * check_info[2]), king_c + (dist_j * check_info[3]))
+                    for dist_j_j in range(1, 8):
+                        valid_square = (king_r + (dist_j_j * check_info[2]), king_c + (dist_j_j * check_info[3]))
                         valid_squares.append(valid_square)
 
                         ## Stop looking once we get to the square on which there is an enemy piece applying check.
@@ -836,9 +836,9 @@ class GameState:
         enemy_c = 'b' if self.white_to_move else 'w'
 
         for dir_j in self.bishop_dirs:
-            for dist_j in range(1, 8):
-                end_r = r + dir_j[0] * dist_j
-                end_c = c + dir_j[1] * dist_j
+            for dist_j_j in range(1, 8):
+                end_r = r + dir_j[0] * dist_j_j
+                end_c = c + dir_j[1] * dist_j_j
 
                 if (0 <= end_r < 8) and (0 <= end_c < 8):
 
@@ -883,9 +883,9 @@ class GameState:
         enemy_c = 'b' if self.white_to_move else 'w'
 
         for dir_j in self.rook_dirs:
-            for dist_j in range(1, 8):
-                end_r = r + dir_j[0] * dist_j
-                end_c = c + dir_j[1] * dist_j
+            for dist_j_j in range(1, 8):
+                end_r = r + dir_j[0] * dist_j_j
+                end_c = c + dir_j[1] * dist_j_j
 
                 if (0 <= end_r < 8) and (0 <= end_c < 8):
 
@@ -933,9 +933,9 @@ class GameState:
         enemy_c = 'b' if self.white_to_move else 'w'
 
         for dir_j in self.king_dirs:
-            for dist_j in range(1, 8):
-                end_r = r + dir_j[0] * dist_j
-                end_c = c + dir_j[1] * dist_j
+            for dist_j_j in range(1, 8):
+                end_r = r + dir_j[0] * dist_j_j
+                end_c = c + dir_j[1] * dist_j_j
 
                 if (0 <= end_r < 8) and (0 <= end_c < 8):
 
