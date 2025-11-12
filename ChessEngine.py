@@ -406,9 +406,9 @@ class GameState:
             possible_pin = ()  ## Reset possible pins for each new direction searched.
 
             ## Look for pieces a dist_jance between [1, 7] (closed set) away from the King.
-            for dist_j_j in range(1, 8):
-                test_r = king_r + dir_j[0] * dist_j_j
-                test_c = king_c + dir_j[1] * dist_j_j
+            for dist_j in range(1, 8):
+                test_r = king_r + dir_j[0] * dist_j
+                test_c = king_c + dir_j[1] * dist_j
 
                 ## Make sure the target square, (test_r, test_c), is on the board...
                 if (0 <= test_r < 8) and (0 <= test_c < 8):
@@ -435,10 +435,10 @@ class GameState:
                         ##  (5)   "     "    " ANY DIRECTION ONE SQUARE AWAY from King and it is a KING.
                         if (((0 <= j <= 3) and (piece_type=="R"))
                                 or ((4 <= j <= 7) and (piece_type=="B"))
-                                or (((dist_j_j==1 and piece_type=="P")
+                                or (((dist_j == 1 and piece_type == "P")
                                 and (((enemy_color=="w") and (6 <= j <= 7)) or ((enemy_color=="b") and (4 <=j <= 5)))))
                                 or (piece_type=="Q")
-                                or (dist_j_j==1 and piece_type=="K")):
+                                or (dist_j == 1 and piece_type == "K")):
 
                             ## No allied-piece in the way, so this is CHECK.
                             if possible_pin == ():
@@ -639,8 +639,8 @@ class GameState:
                     valid_squares = [(check_r, check_c)]
 
                 else:
-                    for dist_j_j in range(1, 8):
-                        valid_square = (king_r + (dist_j_j * check_info[2]), king_c + (dist_j_j * check_info[3]))
+                    for dist_j in range(1, 8):
+                        valid_square = (king_r + (dist_j * check_info[2]), king_c + (dist_j * check_info[3]))
                         valid_squares.append(valid_square)
 
                         ## Stop looking once we get to the square on which there is an enemy piece applying check.
