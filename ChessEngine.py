@@ -179,6 +179,16 @@ class GameState:
             ["wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"],
             ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]
         ]  ## For actually playing the game
+        self.board = [
+            ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
+            ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"],
+            ["--", "--", "--", "--", "bQ", "--", "--", "--"],
+            ["--", "--", "--", "--", "--", "--", "--", "--"],
+            ["--", "--", "--", "--", "--", "--", "--", "--"],
+            ["--", "--", "--", "--", "--", "--", "--", "--"],
+            ["wP", "wP", "wP", "wP", "wB", "wP", "wP", "wP"],
+            ["wR", "--", "--", "--", "wK", "--", "--", "wR"]
+        ]  ## For testing Castling while a piece is pinned to the King
 
         ## Defining fields (other than the board) necessary upon instantiation of a new GameState (i.e., a new game).
         self.white_to_move = True  ## White always moves first at the beginning.
@@ -405,7 +415,7 @@ class GameState:
             dir_j = self.king_dirs[j]
             possible_pin = ()  ## Reset possible pins for each new direction searched.
 
-            ## Look for pieces a dist_jance between [1, 7] (closed set) away from the King.
+            ## Look for pieces a distance dist_j between [1, 7] (closed set) away from the King.
             for dist_j in range(1, 8):
                 test_r = king_r + dir_j[0] * dist_j
                 test_c = king_c + dir_j[1] * dist_j
@@ -431,7 +441,7 @@ class GameState:
                         ##  (1) Enemy piece is ORTHOGONAL to King and it is a ROOK;
                         ##  (2)   "     "    " DIAGONAL    "   "   "   "  " " BISHOP;
                         ##  (3)   "     "    " ONE SQUARE DIAGONALLY away from King and it is a PAWN;
-                        ##  (4)   "     "    " ANY DIRECTION/dist_jANCE away from King and it is a QUEEN;
+                        ##  (4)   "     "    " ANY DIRECTION/DISTANCE away from King and it is a QUEEN;
                         ##  (5)   "     "    " ANY DIRECTION ONE SQUARE AWAY from King and it is a KING.
                         if (((0 <= j <= 3) and (piece_type=="R"))
                                 or ((4 <= j <= 7) and (piece_type=="B"))
