@@ -169,26 +169,16 @@ class GameState:
             2nd   "   " TYPE:  'P', 'N', 'B', 'R', 'Q', or 'K'.
             NOTE: an EMPTY SPACE is denoted by the string "--".
         """
-        # self.board = [
-        #     ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
-        #     ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"],
-        #     ["--", "--", "--", "--", "--", "--", "--", "--"],
-        #     ["--", "--", "--", "--", "--", "--", "--", "--"],
-        #     ["--", "--", "--", "--", "--", "--", "--", "--"],
-        #     ["--", "--", "--", "--", "--", "--", "--", "--"],
-        #     ["wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"],
-        #     ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]
-        # ]  ## For actually playing the game
         self.board = [
             ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
             ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"],
-            ["--", "--", "--", "--", "bQ", "--", "--", "--"],
             ["--", "--", "--", "--", "--", "--", "--", "--"],
-            ["--", "--", "bB", "--", "--", "--", "--", "--"],
+            ["--", "--", "--", "--", "--", "--", "--", "--"],
+            ["--", "--", "--", "--", "--", "--", "--", "--"],
             ["--", "--", "--", "--", "--", "--", "--", "--"],
             ["wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"],
-            ["wR", "--", "--", "--", "wK", "--", "--", "wR"]
-        ]  ## For testing Castling while a piece is pinned to the King
+            ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]
+        ]  ## For actually playing the game
 
         ## Defining fields (other than the board) necessary upon instantiation of a new GameState (i.e., a new game).
         self.white_to_move = True  ## White always moves first at the beginning.
