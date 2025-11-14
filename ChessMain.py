@@ -272,7 +272,6 @@ def main():
         draw_game_state(win=window, gs=gs, valid_moves=valid_moves, square_selected=square_selected)
 
         if gs.checkmate:
-            running = False
             if gs.white_to_move:
                 draw_mate_text(win=window, message="Checkmate! Black wins!")
             else:
