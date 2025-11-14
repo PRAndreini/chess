@@ -178,7 +178,7 @@ class GameState:
             ["--", "--", "--", "--", "--", "--", "--", "--"],
             ["wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"],
             ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]
-        ]  ## For actually playing the game
+        ]
 
         ## Defining fields (other than the board) necessary upon instantiation of a new GameState (i.e., a new game).
         self.white_to_move = True  ## White always moves first at the beginning.
@@ -1007,18 +1007,19 @@ class GameState:
         ec = "b" if self.white_to_move else "w"
 
         ## Essentially, we're using 'search_for_attacks(...)' to see if we're in check!
-        if ((w and not self.search_for_attacks(self.white_king_location[0], self.white_king_location[1], ec)) or
-                ((not w) and not self.search_for_attacks(self.black_king_location[0], self.black_king_location[1], ec))):
+        if ((w and self.search_for_attacks(self.white_king_location[0], self.white_king_location[1], ec)) or
+                ((not w) and self.search_for_attacks(self.black_king_location[0], self.black_king_location[1], ec))):
             return  ## Cannot castle out of check.
 
         ## King-side castling.
-        if ((self.white_to_move and self.current_castling_rights.wks) or
-                ((not self.white_to_move) and self.current_castling_rights.bks)):
+        if ((w and self.current_castling_rights.wks and not(self.search_for_attacks(r, c+1, ec))) or
+                ((not w) and self.current_castling_rights.bks)):
             self.get_king_side_castling_moves(r=r, c=c, moves=moves)
 
         ## Queen-side castling.
-        if ((self.white_to_move and self.current_castling_rights.wqs) or
-                ((not self.white_to_move) and self.current_castling_rights.bqs)):
+        if ((w and self.current_castling_rights.wqs and
+             not(self.search_for_attacks(r, c-1, ec) or self.search_for_attacks(r, c-2, ec))) or
+                ((not w) and self.current_castling_rights.bqs)):
             self.get_queen_side_castling_moves(r=r, c=c, moves=moves)
 
 
