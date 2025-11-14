@@ -169,24 +169,24 @@ class GameState:
             2nd   "   " TYPE:  'P', 'N', 'B', 'R', 'Q', or 'K'.
             NOTE: an EMPTY SPACE is denoted by the string "--".
         """
-        self.board = [
-            ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
-            ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"],
-            ["--", "--", "--", "--", "--", "--", "--", "--"],
-            ["--", "--", "--", "--", "--", "--", "--", "--"],
-            ["--", "--", "--", "--", "--", "--", "--", "--"],
-            ["--", "--", "--", "--", "--", "--", "--", "--"],
-            ["wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"],
-            ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]
-        ]  ## For actually playing the game
+        # self.board = [
+        #     ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
+        #     ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"],
+        #     ["--", "--", "--", "--", "--", "--", "--", "--"],
+        #     ["--", "--", "--", "--", "--", "--", "--", "--"],
+        #     ["--", "--", "--", "--", "--", "--", "--", "--"],
+        #     ["--", "--", "--", "--", "--", "--", "--", "--"],
+        #     ["wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"],
+        #     ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]
+        # ]  ## For actually playing the game
         self.board = [
             ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
             ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"],
             ["--", "--", "--", "--", "bQ", "--", "--", "--"],
             ["--", "--", "--", "--", "--", "--", "--", "--"],
+            ["--", "--", "bB", "--", "--", "--", "--", "--"],
             ["--", "--", "--", "--", "--", "--", "--", "--"],
-            ["--", "--", "--", "--", "--", "--", "--", "--"],
-            ["wP", "wP", "wP", "wP", "wB", "wP", "wP", "wP"],
+            ["wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"],
             ["wR", "--", "--", "--", "wK", "--", "--", "wR"]
         ]  ## For testing Castling while a piece is pinned to the King
 
@@ -1017,8 +1017,8 @@ class GameState:
         ec = "b" if self.white_to_move else "w"
 
         ## Essentially, we're using 'search_for_attacks(...)' to see if we're in check!
-        if ((w and self.search_for_attacks(self.white_king_location[0], self.white_king_location[1], ec)) or
-                ((not w) and self.search_for_attacks(self.black_king_location[0], self.black_king_location[1], ec))):
+        if ((w and not self.search_for_attacks(self.white_king_location[0], self.white_king_location[1], ec)) or
+                ((not w) and not self.search_for_attacks(self.black_king_location[0], self.black_king_location[1], ec))):
             return  ## Cannot castle out of check.
 
         ## King-side castling.
