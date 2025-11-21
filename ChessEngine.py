@@ -259,7 +259,15 @@ class GameState:
         ## If this move is a pawn-promotion, then we must replace the pan with a Queen.
         if m.is_pawn_promotion:
             ## LATER, add this functionality to the "keydown" in ChessMain#.py (main() function).
-            promoted_piece = input("Please choose 'Q', 'R', 'B', or 'N': ").upper()
+            promoted_piece = None
+            valid_promotions = ["N", "B", "R", "Q"]
+
+            ## Making sure the player makes a valid choice:
+            ##  Will not throw an error if the player chooses invalidly (typing, say, "2").
+            ##  Instead, will persistently demand a valid choice until the player makes it.
+            ##  This way, the game will not crash if a player chooses an invalid-promotion by accident.
+            while promoted_piece not in valid_promotions:
+                promoted_piece = input("Please choose 'Q', 'R', 'B', or 'N': ").upper()
 
             ## Most of the time, promotions to Queen, so let's add in a default parameter:\
             if promoted_piece == "":
