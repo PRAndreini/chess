@@ -232,8 +232,6 @@ class GameState:
     def make_move(self, m: Move):
         """
            Given a move (passed as a parameter), make that move.
-            This will NOT work for (a) castling; (b) en-passant; or (c) pawn-promotion;
-            (we will handle these special cases later).
         """
         self.board[m.start_r][m.start_c] = "--"
         self.board[m.end_r][m.end_c] = m.piece_moved
