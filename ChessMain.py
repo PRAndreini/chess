@@ -31,7 +31,7 @@ PIECES = {}  ## Empty (for now) dictionary to store the image files for each pie
 ## For colors, we will use the same as seen on Chess.com, specified via an (R,G,B)-tuple.
 LIGHT = p.Color((235, 236, 211))  ## Light color is OFF-WHITE.
 DARK = p.Color((122, 148, 90))    ## Dark color is DARK-GREEN.
-MATE = p.Color((133, 1, 1))
+MATE = p.Color((133, 1, 1))       ## "MATE" is a contrasting-color in which we write check-/stalemate text.
 COLORS = [LIGHT, DARK]
 
 #######################################################################################################################
@@ -59,11 +59,11 @@ def draw_board(win):
     for r in range(DIMENSION):
         for c in range(DIMENSION):
             fill_color = COLORS[((r+c) % 2)]
-            label_color = COLORS[((r+c+1) % 2)]
             p.draw.rect(win, fill_color, p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
             ## Labeling the RANKS: upper-left corner of the squares on the left-edge of the board.
             if c == 0:
+                label_color = COLORS[((r+c+1) % 2)]
                 rank_number = Move.rows_to_ranks[r]
                 font = p.font.SysFont(name="Arial", size=20, bold=True, italic=False)
                 text_object = font.render(rank_number, True, label_color)
@@ -75,6 +75,7 @@ def draw_board(win):
 
             ## Labeling the FILES: lower-right corner of the squares on the squares on the bottom-edge of the board.
             if r == DIMENSION-1:
+                label_color = COLORS[((r+c+1) % 2)]
                 file_letter = Move.cols_to_files[c]
                 font = p.font.SysFont(name="Arial", size=20, bold=True, italic=False)
                 text_object = font.render(file_letter, True, label_color)
@@ -129,10 +130,8 @@ def animate(m: Move, win, gs, clock):
     """
     dr = m.end_r - m.start_r
     dc = m.end_c - m.start_c
-    total_distance = ((dr ** 2) + (dc ** 2)) ** 0.5
 
-    frames_per_square = 10  ## Play around with this value a bit to slow-down or speed-up animations...
-    frame_count = int(total_distance * frames_per_square)
+    frame_count = 20
 
     for frame in range(frame_count+1):
         progress_frac = frame / frame_count
@@ -277,7 +276,6 @@ def main():
             else:
                 draw_mate_text(win=window, message="Checkmate! White wins!")
         elif gs.stalemate:
-            running = False
             draw_mate_text(win=window, message="Stalemate! Nobody wins!")
 
         clock.tick(MAX_FPS)
