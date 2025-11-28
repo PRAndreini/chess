@@ -13,7 +13,7 @@
 """
 
 ## Importing relevant packages...
-from ChessEngine import *
+from ChessEngine10 import *
 import pygame as p
 p.init()
 p.display.set_caption("Chess!")
@@ -269,7 +269,7 @@ def main():
                             print(vmj.get_pgn())
                             gs.make_move(vmj)
                             move_made = True
-                            animated = True  ## Change this to "True" if you want animations!
+                            animated = False  ## Change this to "True" if you want animations!
 
                             ## Reset selection variables...
                             square_selected = ()
@@ -289,6 +289,7 @@ def main():
 
         draw_game_state(win=window, gs=gs, valid_moves=valid_moves, square_selected=square_selected)
 
+        ## Handling game-ending conditions...
         if gs.checkmate:
             if gs.white_to_move:
                 draw_mate_text(win=window, message="Checkmate! Black wins!")
