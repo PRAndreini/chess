@@ -13,7 +13,7 @@
 """
 
 ## Importing relevant packages...
-from ChessEngine10 import *
+from ChessEngine import *
 import pygame as p
 p.init()
 p.display.set_caption("Chess!")
@@ -101,9 +101,10 @@ def draw_pieces(win, gs: GameState):
                 win.blit(PIECES[piece], p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
 
-def highlight_squares(win, gs: GameState, valid_moves, square_selected):
+def highlight_possible_squares(win, gs: GameState, valid_moves, square_selected):
     """
-       Highlights the piece selected (in blue) and available moves (if any) in yellow.
+       Highlights the piece selected (in blue) and available moves (if any) in orange.
+        This convenient feature for human players allows one to explore all legal moves for a given piece.
     """
     if not square_selected == ():
         r, c = square_selected
@@ -122,6 +123,23 @@ def highlight_squares(win, gs: GameState, valid_moves, square_selected):
             for m in valid_moves:
                 if (m.start_r == r) and (m.start_c == c):
                     win.blit(s, (m.end_c*SQ_SIZE, m.end_r*SQ_SIZE))
+
+
+def highlight_most_recent_move(win, gs: GameState):
+    """
+       Highlights (in yellow) both the starting- and ending-squares for the most-recent move.
+        This convenient feature for human players allows one to identify the opponent's most-recent move.
+    """
+    ## If this is the beginning of the game, then there will be no "most-recent move" made.
+    if len(gs.move_log) > 0:
+        m = gs.move_log[-1]  ## Data about the move.
+
+        ## Highlighting the relevant squares in yellow.
+        s = p.Surface((SQ_SIZE, SQ_SIZE))
+        s.set_alpha(100)  ## Transparency value in (0, 255); 0 is transparent, 255 is opaque.
+        s.fill(p.Color("yellow"))
+        win.blit(s, (m.start_c*SQ_SIZE, m.start_r*SQ_SIZE))
+        win.blit(s, (m.end_c*SQ_SIZE, m.end_r*SQ_SIZE))
 
 
 def animate(m: Move, win, gs, clock):
@@ -172,7 +190,8 @@ def draw_game_state(win, gs: GameState, valid_moves, square_selected):
        Performs all the graphics-operations involved in displaying the current GameState object.
     """
     draw_board(win=win)
-    highlight_squares(win=win, gs=gs, valid_moves=valid_moves, square_selected=square_selected)
+    highlight_possible_squares(win=win, gs=gs, valid_moves=valid_moves, square_selected=square_selected)
+    highlight_most_recent_move(win=win, gs=gs)
     draw_pieces(win=win, gs=gs)
 
 #######################################################################################################################
@@ -250,7 +269,7 @@ def main():
                             print(vmj.get_pgn())
                             gs.make_move(vmj)
                             move_made = True
-                            animated = False  ## Change this to "True" if you want animations!
+                            animated = True  ## Change this to "True" if you want animations!
 
                             ## Reset selection variables...
                             square_selected = ()
