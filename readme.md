@@ -8,7 +8,5 @@ To use this code:
 2. Download from the chess piece .png files.
 3. Put the chess piece .png files in a folder called "pieces" (case-sensitive!).
 
-Troubleshooting: sometimes, you need to edit "ChessMain.py" to add/remove the charcaters "chess/" from the function "load_piece_images()" in "ChessMain.py" at line 51.
-
 MOST IMPORTANT: DO NOT FORGET!
     Have fun!
