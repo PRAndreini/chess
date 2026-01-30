@@ -1,6 +1,6 @@
 """
    By Paul Robert Andreini
-    23 Jan 2026
+    29 Jan 2026
 
    Code here is LOOSELY based on a YouTube tutorial series, whose playlist is visible at the following link:
         https://www.youtube.com/playlist?list=PLBwF487qi8MGU81nDGaeNE1EnNEPYWKY_
@@ -982,7 +982,10 @@ class GameState:
                     current_player_is_in_check, pins, checks = self.search_for_pins_and_checks()
 
                     if not current_player_is_in_check:
-                        moves.append(Move(start_square=(r, c), end_square=(end_r, end_c), b=self.board))
+
+                        ## Getting rid of a stupid bug where the King can move itself into check...
+                        if not self.search_for_attacks(r=end_r, c=end_c, enemy_c='b' if ally_c=='w' else 'b'):
+                            moves.append(Move(start_square=(r, c), end_square=(end_r, end_c), b=self.board))
 
                     ## Now, MOVE THE KING BACK to its original location!
                     if ally_c == "w":
