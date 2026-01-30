@@ -6,7 +6,7 @@
         https://www.youtube.com/playlist?list=PLBwF487qi8MGU81nDGaeNE1EnNEPYWKY_
 
    This code is for EPISODE 11.
-        c.f. Sharick Ep. 9.
+        cf. Sharick Ep. 9.
 
    ###########################################################################
 
