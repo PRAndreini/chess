@@ -143,7 +143,7 @@ class Move:
                     return f" {rf_start} --> {rf_end}"
 
         ## PGN uses SPECIAL notation for castling-moves: "O - O" for king-side; "O - O - O" for queen-side.
-        if self.is_castling:
+        elif self.is_castling:
 
             ## King moving RIGHT (from white's perspective) --> KING-side castle-move.
             if self.end_c - self.start_c == 2:
