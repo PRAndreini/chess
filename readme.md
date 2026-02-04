@@ -15,7 +15,7 @@ To use this code:
 
 To play the game:
 
-0. See the rules of chess, such as [The-Rules of Chess](https://en.wikipedia.org/wiki/Rules_of_chess).
+0. See the rules of chess, such as [Wikipedia: The Rules of Chess](https://en.wikipedia.org/wiki/Rules_of_chess).
 1. To play as white (default): click on a piece (it will appear in blue), then click on a valid square to which to move this piece (it will appear in orange); the last move made will appear in yellow.
 
 ------------------------------------------------------------------------------------------------------------------------
