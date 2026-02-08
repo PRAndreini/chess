@@ -2,7 +2,7 @@ CHESS-FROM-SCRATCH PACKAGE README (AI-version):
 
 ------------------------------------------------------------------------------------------------------------------------
 
-To use this code:
+To use this code (at any point, press "F" to switch between perspectives at the bottom of the board: black <--> white):
 
 0. Ensure that you have Python3 installed on your system.
     - The latest version is always best. This code was written using v. 3.12.9 (although there shouldn't be a problem with using an earlier version of Python3).
