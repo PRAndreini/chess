@@ -250,8 +250,8 @@ def main():
 
     ## Defining boolean variables to handle AI.
     ##  LATER: Define DIFFICULTY-LEVELS with, say, an integer value from 0 to 10.
-    human_player_white = False
-    human_player_black = True
+    human_player_white = True
+    human_player_black = False
 
     running = True
 
