@@ -14,6 +14,7 @@ CHESS-FROM-SCRATCH PACKAGE README (AI version):
 To play the game:
 
 - See the rules of chess, such as [Wikipedia: The Rules of Chess](https://en.wikipedia.org/wiki/Rules_of_chess).
+- To undo the most-recent move made, press the "Z" key.
 - To clear the board and restart, press the "C" key at any time.
 - By default, all pawns promote to a QUEEN upon reaching the back rank.
 - To change this behavior, press the "R" key for a ROOK; "B" for a BISHOP; or "N" for a kNight.
