@@ -1,8 +1,6 @@
-CHESS-FROM-SCRATCH PACKAGE README (AI-version):
+CHESS-FROM-SCRATCH PACKAGE README (AI version):
 
 ------------------------------------------------------------------------------------------------------------------------
-
-To use this code (at any point, press "F" to switch between perspectives at the bottom of the board: black <--> white):
 
 0. Ensure that you have Python3 installed on your system.
     - The latest version is always best. This code was written using v. 3.12.9 (although there shouldn't be a problem with using an earlier version of Python3).
@@ -15,8 +13,18 @@ To use this code (at any point, press "F" to switch between perspectives at the 
 
 To play the game:
 
-0. See the rules of chess, such as [Wikipedia: The Rules of Chess](https://en.wikipedia.org/wiki/Rules_of_chess).
-1. To play as white (default): click on a piece (it will appear in blue), then click on a valid square to which to move this piece (it will appear in orange); the last move made will appear in yellow.
+- See the rules of chess, such as [Wikipedia: The Rules of Chess](https://en.wikipedia.org/wiki/Rules_of_chess).
+- To clear the board and restart, press the "C" key at any time.
+- By default, all pawns promote to a QUEEN upon reaching the back rank.
+- To change this behavior, press the "R" key for a ROOK; "B" for a BISHOP; or "N" for a kNight.
+- After you press a key, all future promotions will become this piece, unless a player presses a different key to change his/her mind.
+- To go back to promoting to a QUEEN, press the "ENTER" key.
+
+Playing as white/black versus a human/AI --- Setting boolean variables in ChessMain.py:
+- To set up a game between TWO HUMANS, set "human_player_white = True" and "human_player_black = True";
+- To set up a game between ONE HUMAN AND AI, set either boolean to False, depending on which piece color you want to play as a human.
+- To set up an onslaught of AI VERSUS AI, set both booleans to False.
+
 
 ------------------------------------------------------------------------------------------------------------------------
 
