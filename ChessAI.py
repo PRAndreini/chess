@@ -61,6 +61,7 @@ def get_greedy_move(gs: GameState, vm_list: list()):
     """
        Finds the best move based purely on material (no positional advantage considered).
     """
+    random.shuffle(vm_list)
     turn_multiplier = 1 if gs.white_to_move else -1
     opponent_min_max_score = CHECKMATE
     best_player_move = None
