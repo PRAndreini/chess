@@ -16,12 +16,13 @@ To play the game:
 - See the rules of chess, such as [Wikipedia: The Rules of Chess](https://en.wikipedia.org/wiki/Rules_of_chess).
 - To play as white (default): click on a piece (it will appear in blue), then click on a valid square to which to move this piece (it will appear in orange); the last move made will appear in yellow.
 - To play as black, white must first make a move (note that you can flip the board to be viewed from black's perspective by pressing the "F" key at any time).
---- Note that, in this (non-AI) version, both players must be humans clicking on pieces and squares.
+- Note that, in this (non-AI) version, both players must be humans clicking on pieces and squares.
+- To undo the most-recent move made, press the "Z" key.
 - To clear the board and restart, press the "C" key at any time.
 - By default, all pawns promote to a QUEEN upon reaching the back rank.
---- To change this behavior, press the "R" key for a ROOK; "B" for a BISHOP; or "N" for a kNight.
---- After you press a key, all future promotions will become this piece, unless a player presses a different key to change his/her mind.
---- To go back to promoting to a QUEEN, press the "ENTER" key.
+- To change this behavior, press the "R" key for a ROOK; "B" for a BISHOP; or "N" for a kNight.
+- After you press a key, all future promotions will become this piece, unless a player presses a different key to change his/her mind.
+- To go back to promoting to a QUEEN, press the "ENTER" key.
 
 
 ------------------------------------------------------------------------------------------------------------------------
