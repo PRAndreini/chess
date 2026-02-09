@@ -5,7 +5,7 @@
    Code here is LOOSELY based on a YouTube tutorial series, whose playlist is visible at the following link:
         https://www.youtube.com/playlist?list=PLBwF487qi8MGU81nDGaeNE1EnNEPYWKY_
 
-   This code is for EPISODE 12 (c.f., Sharick Ep. 11).
+   This code is for EPISODE 13 (c.f., Sharick Ep. 12).
 
    ###########################################################################
 

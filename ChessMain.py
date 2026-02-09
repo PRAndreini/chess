@@ -5,7 +5,7 @@
    Code here is LOOSELY based on a YouTube tutorial series, whose playlist is visible at the following link:
         https://www.youtube.com/playlist?list=PLBwF487qi8MGU81nDGaeNE1EnNEPYWKY_
 
-   This code is for EPISODE 12 (c.f. Sharick Ep. 11).
+   This code is for EPISODE 13 (c.f. Sharick Ep. 12).
 
    MAIN DRIVER FILE is responsible for:
     (a) handling user input;
@@ -330,7 +330,7 @@ def main():
                         col = 7 - mouse_xy_loc[0] // SQ_SIZE
                         row = 7 - mouse_xy_loc[1] // SQ_SIZE
 
-                    ## If player clicks the same square twice: (a) de-select that piece and (b) reset the player clicks.
+                    ## If player clicks the same square twice: (a) de-select that piece; (b) reset the player clicks.
                     if square_selected == (row, col):
                         square_selected = ()
                         player_clicks = []
@@ -345,7 +345,7 @@ def main():
                         move = Move(start_square=player_clicks[0], end_square=player_clicks[1], b=gs.board)
 
                         ## Validate the move before allowing the player to make it.
-                        ##  We use a FOR-LOOP instead of an IF-STATEMENT because, in the future, we'll add FLAGS to moves.
+                        ##  We use a FOR-LOOP instead of IF-STATEMENT because, in the future, we'll add FLAGS to moves.
                         for j in range(len(valid_moves)):
                             if move == valid_moves[j]:
                                 print(valid_moves[j].get_pgn())
@@ -365,8 +365,13 @@ def main():
         ##  Conditional-statements here make sure (a) the game is not over AND (b) the human is not playing.
         if (not gs.checkmate) and (not gs.stalemate) and (not is_humans_turn):
             valid_moves = gs.get_all_valid_moves()  ## Testing this line here, to get all AI move. Might slow down...
-            print(f"The AI currently has {len(valid_moves)} valid moves available to play.")
-            ai_move = get_random_move(vm_list=valid_moves)
+            # print(f"The AI currently has {len(valid_moves)} valid moves available to play.")  ## Diagnostic.
+            ai_move = get_greedy_move(gs=gs, vm_list=valid_moves)
+
+            ## Just in case the AI cannot decide which move is "best":
+            if ai_move is None:
+                ai_move = get_random_move(vm_list=valid_moves)
+
             print(ai_move.get_pgn())
             gs.make_move(ai_move)
             move_made = True
