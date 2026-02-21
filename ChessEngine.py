@@ -1044,10 +1044,6 @@ class GameState:
                 if not (end_piece[0] == ally_c):
 
                     ## TEMPORARILY place the King on the desired end-square; then search for checks!
-                    """
-                       This code is bugged. In particular, it lets the King move AWAY from a check, ...
-                        ... which should not be allowed, because the King does not escape check.
-                    """
                     if ally_c == "w":
                         self.white_king_location = (end_r, end_c)
                     else:
