@@ -224,10 +224,10 @@ class GameState:
 
         ## Directions different types of pieces can move.
         ##  EXCEPT pawns, which will be handled separately in their own method.
-        self.knight_dirs = ((-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1))  ## 8 L-SHAPE dirs.
-        self.bishop_dirs = ((-1, -1), (-1, 1), (1, -1), (1, 1))  ## All 4 DIAGONAL dirs.
-        self.rook_dirs = ((-1, 0), (0, -1), (1, 0), (0, 1))  ## All 4 ORTHOGONAL dirs.
-        self.king_dirs = ((-1, 0), (0, -1), (1, 0), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1))  ## All 8 dirs.
+        self.knight_dirs = [(-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1)]  ## 8 L-SHAPE dirs.
+        self.bishop_dirs = [(-1, -1), (-1, 1), (1, -1), (1, 1)]  ## All 4 DIAGONAL dirs.
+        self.rook_dirs = [(-1, 0), (0, -1), (1, 0), (0, 1)]  ## All 4 ORTHOGONAL dirs.
+        self.king_dirs = [(-1, 0), (0, -1), (1, 0), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]  ## All 8 RADIAL dirs.
 
         ## Defining a "dict" to tell when different pieces are moved, thus, which specific method to call to get moves.
         self.move_functions = {
@@ -682,12 +682,21 @@ class GameState:
             ## In the case that ONLY ONE enemy piece applies check, we can BLOCK check, CAPTURE, or MOVE the King.
             ##  We do so by first generating all possible moves, then removing those that do not deal with the check.
             if len(self.checks) == 1:
-                moves = self.get_all_possible_moves()
-
                 ## Storing information about the check in a few local variables...
                 check_info = self.checks[0]
                 check_r = check_info[0]  ## ROW of the enemy piece applying check.
                 check_c = check_info[1]  ## COL  "  "    "    "        "      "
+
+                ## Adding this block of code to fix a bug that lets a player move their King away, remaining in check.
+                check_dir_r = -check_info[2]
+                check_dir_c = -check_info[3]
+                ## The field "avoid" is the direction moving away from a checking-piece (bishop, rook, queen).
+                ##  We do NOT want this direction to be valid, cuz you cannot just move away from a checking-piece.
+                ##  We will pass this information into "get_all_possible_moves", which will pass it to king-moves.
+                avoid = (check_dir_r, check_dir_c)
+
+                ## Now, we proceed to get all possible moves, but considering the direction to avoid for the King.
+                moves = self.get_all_possible_moves(bad_direction=avoid)
                 enemy_piece_applying_check = self.board[check_r][check_c]
                 valid_squares = []  ## Empty (for now) list of valid squares for interposition, blocking check.
 
@@ -744,7 +753,7 @@ class GameState:
         return moves
 
 
-    def get_all_possible_moves(self):
+    def get_all_possible_moves(self, bad_direction=None):
         """
            Gets all possible moves for piece regardless of checks and pins.
         """
@@ -756,12 +765,13 @@ class GameState:
 
                 if (self.white_to_move and piece_color=='w') or (not self.white_to_move and piece_color=='b'):
                     piece_type = self.board[r][c][1]
-                    self.move_functions[piece_type](r, c, moves)  ## Calls move function based on piece type.
+                    ## Calls move function based on piece type.
+                    self.move_functions[piece_type](r, c, moves, bad_direction=bad_direction)
 
         return moves
 
 
-    def get_pawn_moves(self, r, c, moves):
+    def get_pawn_moves(self, r, c, moves, bad_direction=None):
         """
            Returns all valid moves for a PAWN at location (r, c).
         """
@@ -839,7 +849,7 @@ class GameState:
                                       is_en_passant=True))
 
 
-    def get_knight_moves(self, r, c, moves):
+    def get_knight_moves(self, r, c, moves, bad_direction=None):
         """
            Returns all valid moves for a KNIGHT at location (r, c).
         """
@@ -869,7 +879,7 @@ class GameState:
                         moves.append(Move(start_square=(r, c), end_square=(end_r, end_c), b=self.board))
 
 
-    def get_bishop_moves(self, r, c, moves):
+    def get_bishop_moves(self, r, c, moves, bad_direction=None):
         """
            Returns all valid moves for a BISHOP at location (r, c).
         """
@@ -915,7 +925,7 @@ class GameState:
                     break
 
 
-    def get_rook_moves(self, r, c, moves):
+    def get_rook_moves(self, r, c, moves, bad_direction=None):
         """
            Returns all valid moves for a ROOK at location (r, c).
         """
@@ -962,7 +972,7 @@ class GameState:
                     break
 
 
-    def get_queen_moves(self, r, c, moves):
+    def get_queen_moves(self, r, c, moves, bad_direction=None):
         """
            Returns all valid moves for a QUEEN at location (r, c).
 
@@ -1012,13 +1022,19 @@ class GameState:
                     break
 
 
-    def get_king_moves(self, r, c, moves):
+    def get_king_moves(self, r, c, moves, bad_direction=None):
         """
            Returns all valid moves for a KING at location (r, c).
         """
         ally_c = 'w' if self.white_to_move else 'b'
+        dirs = self.king_dirs
 
-        for dir_j in self.king_dirs:
+        if bad_direction is not None:
+            for dir_j in self.king_dirs:
+                if dir_j == bad_direction:
+                    dirs.remove(dir_j)
+
+        for dir_j in dirs:
             end_r = r + dir_j[0]
             end_c = c + dir_j[1]
 
@@ -1028,6 +1044,10 @@ class GameState:
                 if not (end_piece[0] == ally_c):
 
                     ## TEMPORARILY place the King on the desired end-square; then search for checks!
+                    """
+                       This code is bugged. In particular, it lets the King move AWAY from a check, ...
+                        ... which should not be allowed, because the King does not escape check.
+                    """
                     if ally_c == "w":
                         self.white_king_location = (end_r, end_c)
                     else:
