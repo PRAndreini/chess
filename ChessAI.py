@@ -10,14 +10,13 @@
    AI FILE is responsible for generating the computer's move (only in the case of 0/1-player game).
 """
 
-## Importing "random" package to be able to pick a move at random from the available options, as a last-resort.
+## Importing relevant packages...
+from ChessEngine13 import GameState
 import random
-
-from ChessEngine import GameState
 
 ## Dictionary defines the relative values of the pieces, with pawn fixed at "1".
 ##  NOTE: We give a King value "0", because a player can never lose his/her King (it would be checkmate).
-piece_scores = {
+PIECE_SCORES = {
     "P": 1,
     "N": 3,
     "B": 3,
@@ -50,9 +49,9 @@ def score_material(b):
     for row in b:
         for square in row:
             if square[0] == "w":
-                score += piece_scores[square[1]]
+                score += PIECE_SCORES[square[1]]
             elif square[0] == "b":
-                score -= piece_scores[square[1]]
+                score -= PIECE_SCORES[square[1]]
 
     return score
 
