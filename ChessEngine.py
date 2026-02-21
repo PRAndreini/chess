@@ -277,8 +277,7 @@ class GameState:
             CastlingRights(wks=self.current_castling_rights.wks,
                            bks=self.current_castling_rights.bks,
                            wqs=self.current_castling_rights.wqs,
-                           bqs=self.current_castling_rights.bqs
-                           )
+                           bqs=self.current_castling_rights.bqs)
         ]
 
 
