@@ -137,7 +137,7 @@ def get_greedy_move(gs: GameState, vm_list: list()):
 
 def helper_method_first_call(gs: GameState, vm_list: list()):
     """
-       A helper method to call "get_best_move_min_max(...)", to initiate the global variable.
+       A helper method to call "get_move_min_max(...)", to initiate the global variable.
     """
     global next_move
     next_move = None
@@ -164,7 +164,7 @@ def get_move_min_max(gs: GameState, vm_list: list(), depth: int, white_to_move: 
             random.shuffle(next_moves)
             score = get_move_min_max(gs=gs, vm_list=next_moves, depth=depth-1, white_to_move=False)
 
-            if score > max_score:
+            if max_score > score:
                 max_score = score
 
                 if depth == DEPTH:
@@ -183,7 +183,7 @@ def get_move_min_max(gs: GameState, vm_list: list(), depth: int, white_to_move: 
             random.shuffle(next_moves)
             score = get_move_min_max(gs=gs, vm_list=next_moves, depth=depth-1, white_to_move=True)
 
-            if score < min_score:
+            if min_score < score:
                 min_score = score
 
                 if depth == DEPTH:
