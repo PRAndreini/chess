@@ -1,11 +1,11 @@
 """
    By Paul Robert Andreini
-    08 Feb 2026
+    21 Feb 2026
 
    Code here is LOOSELY based on a YouTube tutorial series, whose playlist is visible at the following link:
         https://www.youtube.com/playlist?list=PLBwF487qi8MGU81nDGaeNE1EnNEPYWKY_
 
-   This code is for EPISODE 14 (cf. Sharick Ep. 13).
+   This code is for EPISODE 15 (cf. Sharick Ep. 14).
 
    AI FILE is responsible for generating the computer's move (only in the case of 0/1-player game).
 """
@@ -29,7 +29,7 @@ CHECKMATE = 1000  ## Checkmate is the best-possible move, so set this value very
 STALEMATE = 0     ## Stalemate is better than losing, but is not as good as winning.
 
 ## Recursive-depth: how far do we want to go down the tree?
-DEPTH = 2
+DEPTH = 3
 
 
 def get_random_move(vm_list: list()):
@@ -74,10 +74,9 @@ def score_board(gs: GameState):
     elif gs.stalemate:
         return STALEMATE
 
-
     score = 0
 
-    for row in gs.b:
+    for row in gs.board:
         for square in row:
             if square[0] == "w":
                 score += PIECE_SCORES[square[1]]
@@ -137,11 +136,16 @@ def get_greedy_move(gs: GameState, vm_list: list()):
 
 def helper_method_first_call(gs: GameState, vm_list: list()):
     """
-       A helper method to call "get_move_min_max(...)", to initiate the global variable.
+       A helper method to call "get_move_nega_max(...)", to initiate the global variable.
     """
-    global next_move
+    global next_move, counter
     next_move = None
-    get_move_min_max(gs=gs, vm_list=vm_list, depth=DEPTH, white_to_move=gs.white_to_move)
+    random.shuffle(vm_list)
+    # get_move_min_max(gs=gs, vm_list=vm_list, depth=DEPTH, white_to_move=gs.white_to_move)
+    # get_move_nega_max(gs=gs, vm_list=vm_list, depth=DEPTH, turn_multiplier=1 if gs.white_to_move else -1)
+    get_move_nega_max_with_alpha_beta_pruning(gs=gs, vm_list=vm_list, depth=DEPTH,
+                                              alpha=-CHECKMATE, beta=CHECKMATE,
+                                              turn_multiplier=1 if gs.white_to_move else -1)
     return next_move
 
 
@@ -164,7 +168,7 @@ def get_move_min_max(gs: GameState, vm_list: list(), depth: int, white_to_move: 
             random.shuffle(next_moves)
             score = get_move_min_max(gs=gs, vm_list=next_moves, depth=depth-1, white_to_move=False)
 
-            if score > max_score:
+            if max_score > score:
                 max_score = score
 
                 if depth == DEPTH:
@@ -183,7 +187,7 @@ def get_move_min_max(gs: GameState, vm_list: list(), depth: int, white_to_move: 
             random.shuffle(next_moves)
             score = get_move_min_max(gs=gs, vm_list=next_moves, depth=depth-1, white_to_move=True)
 
-            if score < min_score:
+            if min_score < score:
                 min_score = score
 
                 if depth == DEPTH:
@@ -192,5 +196,87 @@ def get_move_min_max(gs: GameState, vm_list: list(), depth: int, white_to_move: 
             gs.undo_move()
 
         return min_score
+
+
+def get_move_nega_max(gs: GameState, vm_list: list(), depth: int, turn_multiplier: int):
+    """
+       Similar to the MinMax algorithm, but a bit cleaner; this is NegaMax.
+        Instead of param "white_to_move" being a bool, it is an integer on the set {±1}, which we call turn_multiplier.
+        In particular, turn_multiplier=1 if it is White's turn; turn_multiplier=-1 if it is Black's turn.
+
+       The idea here is to ALWAYS MAXIMIZE, then multiply by turn_multiplier.
+        This gives a maximum for White and a minimum for Black, just like the MinMax algorithm, but with only 1 loop.
+    """
+    global next_move
+    random.shuffle(vm_list)
+
+    if depth == 0:
+        return turn_multiplier * score_board(gs=gs)
+
+    max_score = -CHECKMATE
+    for m in vm_list:
+        gs.make_move(m)
+
+        next_moves = gs.get_all_valid_moves()
+        random.shuffle(next_moves)
+        score = -get_move_nega_max(gs=gs, vm_list=next_moves, depth=depth-1, turn_multiplier=-turn_multiplier)
+
+        if score > max_score:
+            max_score = score
+
+            if depth == DEPTH:
+                next_move = m
+
+        gs.undo_move()
+
+    return max_score
+
+
+def get_move_nega_max_with_alpha_beta_pruning(gs: GameState, vm_list: list(), depth: int,
+                                              alpha, beta, turn_multiplier: int):
+    """
+       Similar to the MinMax algorithm, but a bit cleaner; this is NegaMax.
+        Instead of param "white_to_move" being a bool, it is an integer on the set {±1}, which we call turn_multiplier.
+        In particular, turn_multiplier=1 if it is White's turn; turn_multiplier=-1 if it is Black's turn.
+
+       The idea here is to ALWAYS MAXIMIZE, then multiply by turn_multiplier.
+        This gives a maximum for White and a minimum for Black, just like the MinMax algorithm, but with only 1 loop.
+
+       This version includes ALPHA-BETA PRUNING, which "cuts off" worse "branches" when it detects no improvment.
+    """
+    global next_move
+    random.shuffle(vm_list)
+
+    if depth == 0:
+        return turn_multiplier * score_board(gs=gs)
+
+    ## LATER -- implement MOVE ORDERING: checks, captures, attacks, defending.
+    max_score = -CHECKMATE
+    for m in vm_list:
+        gs.make_move(m)
+
+        next_moves = gs.get_all_valid_moves()
+        random.shuffle(next_moves)
+        score = -get_move_nega_max_with_alpha_beta_pruning(gs=gs, vm_list=next_moves, depth=depth-1,
+                                                           alpha=-beta, beta=-alpha,
+                                                           turn_multiplier=-turn_multiplier)
+
+        if score > max_score:
+            max_score = score
+
+            if depth == DEPTH:
+                next_move = m
+
+        gs.undo_move()
+
+        ## Pruning happens here!
+        if max_score > alpha:
+            alpha = max_score
+
+        ## Stop looking, HERE, because our new max-score is worse for our opponent than his/her best score is for us!
+        if alpha >= beta:
+            break
+
+    return max_score
 
 ## E.O.F.

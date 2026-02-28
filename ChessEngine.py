@@ -1,11 +1,11 @@
 """
    By Paul Robert Andreini
-    08 Feb 2026
+    21 Feb 2026
 
    Code here is LOOSELY based on a YouTube tutorial series, whose playlist is visible at the following link:
         https://www.youtube.com/playlist?list=PLBwF487qi8MGU81nDGaeNE1EnNEPYWKY_
 
-   This code is for EPISODE 14 (c.f., Sharick Ep. 13).
+   This code is for EPISODE 15 (c.f., Sharick Ep. 14).
 
    ###########################################################################
 
@@ -687,6 +687,7 @@ class GameState:
                 check_c = check_info[1]  ## COL  "  "    "    "        "      "
 
                 ## Adding this block of code to fix a bug that lets a player move their King away, remaining in check.
+                ########## Only if it's in check from a BISHOP/ROOK/QUEEN! And only in that direction!
                 check_dir_r = -check_info[2]
                 check_dir_c = -check_info[3]
                 ## The field "avoid" is the direction moving away from a checking-piece (bishop, rook, queen).
