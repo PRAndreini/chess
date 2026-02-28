@@ -5,7 +5,7 @@
    Code here is LOOSELY based on a YouTube tutorial series, whose playlist is visible at the following link:
         https://www.youtube.com/playlist?list=PLBwF487qi8MGU81nDGaeNE1EnNEPYWKY_
 
-   This code is for EPISODE 13 (c.f. Sharick Ep. 12).
+   This code is for EPISODE 14 (c.f. Sharick Ep. 13).
 
    MAIN DRIVER FILE is responsible for:
     (a) handling user input;
@@ -365,8 +365,7 @@ def main():
         ##  Conditional-statements here make sure (a) the game is not over AND (b) the human is not playing.
         if (not gs.checkmate) and (not gs.stalemate) and (not is_humans_turn):
             valid_moves = gs.get_all_valid_moves()  ## Testing this line here, to get all AI move. Might slow down...
-            # print(f"The AI currently has {len(valid_moves)} valid moves available to play.")  ## Diagnostic.
-            ai_move = get_greedy_move(gs=gs, vm_list=valid_moves)
+            ai_move = helper_method_first_call(gs=gs, vm_list=valid_moves)
 
             ## Just in case the AI cannot decide which move is "best":
             if ai_move is None:

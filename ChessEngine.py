@@ -5,7 +5,7 @@
    Code here is LOOSELY based on a YouTube tutorial series, whose playlist is visible at the following link:
         https://www.youtube.com/playlist?list=PLBwF487qi8MGU81nDGaeNE1EnNEPYWKY_
 
-   This code is for EPISODE 13 (c.f., Sharick Ep. 12).
+   This code is for EPISODE 14 (c.f., Sharick Ep. 13).
 
    ###########################################################################
 
@@ -277,8 +277,7 @@ class GameState:
             CastlingRights(wks=self.current_castling_rights.wks,
                            bks=self.current_castling_rights.bks,
                            wqs=self.current_castling_rights.wqs,
-                           bqs=self.current_castling_rights.bqs
-                           )
+                           bqs=self.current_castling_rights.bqs)
         ]
 
 
@@ -493,7 +492,7 @@ class GameState:
                         if (((0 <= j <= 3) and (piece_type=="R"))
                                 or ((4 <= j <= 7) and (piece_type=="B"))
                                 or (((dist_j==1 and piece_type=="P")
-                                and (((enemy_color=="w") and (6 <= j <= 7)) or ((enemy_color=="b") and (4 <=j <= 5)))))
+                                and ((enemy_color=="w") and (6 <= j <= 7) or (enemy_color=="b") and (4 <= j <= 5))))
                                 or (piece_type=="Q")
                                 or (dist_j==1 and piece_type=="K")):
 
@@ -734,6 +733,7 @@ class GameState:
         if len(moves) == 0:
             if self.current_player_is_in_check:
                 self.checkmate = True
+                print("\n1 - 0") if not self.white_to_move else print("\n0 - 1")  ## Prints out who won the game.
 
             else:
                 self.stalemate = True
@@ -1030,9 +1030,7 @@ class GameState:
         dirs = self.king_dirs
 
         if bad_direction is not None:
-            for dir_j in self.king_dirs:
-                if dir_j == bad_direction:
-                    dirs.remove(dir_j)
+            dirs = [dir_j for dir_j in dirs if dir_j != bad_direction]
 
         for dir_j in dirs:
             end_r = r + dir_j[0]
