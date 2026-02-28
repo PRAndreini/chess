@@ -11,7 +11,7 @@
 """
 
 ## Importing relevant packages...
-from ChessEngine import GameState
+from ChessEngine14 import GameState
 import random
 
 ## Dictionary defines the relative values of the pieces, with pawn fixed at "1".
@@ -164,7 +164,7 @@ def get_move_min_max(gs: GameState, vm_list: list(), depth: int, white_to_move: 
             random.shuffle(next_moves)
             score = get_move_min_max(gs=gs, vm_list=next_moves, depth=depth-1, white_to_move=False)
 
-            if max_score > score:
+            if score > max_score:
                 max_score = score
 
                 if depth == DEPTH:
@@ -183,7 +183,7 @@ def get_move_min_max(gs: GameState, vm_list: list(), depth: int, white_to_move: 
             random.shuffle(next_moves)
             score = get_move_min_max(gs=gs, vm_list=next_moves, depth=depth-1, white_to_move=True)
 
-            if min_score < score:
+            if score < min_score:
                 min_score = score
 
                 if depth == DEPTH:
