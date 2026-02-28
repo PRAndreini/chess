@@ -11,7 +11,7 @@
 """
 
 ## Importing relevant packages...
-from ChessEngine14 import GameState
+from ChessEngine import GameState
 import random
 
 ## Dictionary defines the relative values of the pieces, with pawn fixed at "1".
