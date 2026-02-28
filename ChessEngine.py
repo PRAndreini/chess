@@ -733,6 +733,7 @@ class GameState:
         if len(moves) == 0:
             if self.current_player_is_in_check:
                 self.checkmate = True
+                print("\n1 - 0") if not self.white_to_move else print("\n0 - 1")  ## Prints out who won the game.
 
             else:
                 self.stalemate = True
