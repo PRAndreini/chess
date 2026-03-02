@@ -5,7 +5,7 @@
    Code here is LOOSELY based on a YouTube tutorial series, whose playlist is visible at the following link:
         https://www.youtube.com/playlist?list=PLBwF487qi8MGU81nDGaeNE1EnNEPYWKY_
 
-   This code is for EPISODE 16 (cf. Sharick Ep. 15).
+   This code is for EPISODE 16.
 
    AI FILE is responsible for generating the computer's move (only in the case of 0/1-player game).
 """
