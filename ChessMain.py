@@ -183,11 +183,23 @@ def animate(m: Move, win, gs, clock):
         p.draw.rect(win, color, end_square)
         ## ... and we also need to draw back the captured piece (if any) ...
         ##  ... unless it's an "en-passant" move, which would draw a "phantom pawn".
-        if (m.piece_captured != "--") and (not m.is_en_passant):
+        if m.piece_captured != "--":
+            if m.is_en_passant:
+
+                ## White to move, capturing en-passant.
+                if m.piece_captured[0] == "b":
+                    epr = end_r + 1
+                else:
+                    epr = end_r - 1
+
+                end_square = p.Rect(end_c * SQ_SIZE, epr * SQ_SIZE, SQ_SIZE, SQ_SIZE)
+
             win.blit(PIECES[m.piece_captured], end_square)
 
+
         ## Draw the moving piece to complete the animation protocol!
-        win.blit(PIECES[m.piece_moved], p.Rect(gfx_c*SQ_SIZE, gfx_r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
+        if m.piece_moved != "--":
+            win.blit(PIECES[m.piece_moved], p.Rect(gfx_c*SQ_SIZE, gfx_r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
         p.display.flip()
         clock.tick(MAX_FPS)
 

@@ -335,9 +335,8 @@ class GameState:
                 self.board[m.end_r][m.end_c+1] = self.board[m.end_r][m.end_c-2]  ## Moves (copies) rook to NEW square.
                 self.board[m.end_r][m.end_c-2] = "--"  ## Deletes rook from OLD square.
 
-        ## If an en-passant capture is possible, then this is the target-square.
-        self.en_passant_possible = ()
-        self.en_passant_possible_log = [self.en_passant_possible]
+        ## Update the possibility of en-passant.
+        self.en_passant_possible_log.append(self.en_passant_possible)
 
         ## Update the castling rights as appropriate whenever a ROOK or a KING moves.
         self.update_castling_rights(m)
