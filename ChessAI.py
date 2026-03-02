@@ -1,11 +1,11 @@
 """
    By Paul Robert Andreini
-    21 Feb 2026
+    01 Mar 2026
 
    Code here is LOOSELY based on a YouTube tutorial series, whose playlist is visible at the following link:
         https://www.youtube.com/playlist?list=PLBwF487qi8MGU81nDGaeNE1EnNEPYWKY_
 
-   This code is for EPISODE 15 (cf. Sharick Ep. 14).
+   This code is for EPISODE 16 (cf. Sharick Ep. 15).
 
    AI FILE is responsible for generating the computer's move (only in the case of 0/1-player game).
 """

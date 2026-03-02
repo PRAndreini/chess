@@ -1,11 +1,11 @@
 """
    By Paul Robert Andreini
-    21 Feb 2026
+    01 Mar 2026
 
    Code here is LOOSELY based on a YouTube tutorial series, whose playlist is visible at the following link:
         https://www.youtube.com/playlist?list=PLBwF487qi8MGU81nDGaeNE1EnNEPYWKY_
 
-   This code is for EPISODE 15 (c.f. Sharick Ep. 14).
+   This code is for EPISODE 16 (c.f. Sharick Ep. 15).
 
    MAIN DRIVER FILE is responsible for:
     (a) handling user input;
@@ -251,7 +251,7 @@ def main():
     ## Defining boolean variables to handle AI.
     ##  LATER: Define DIFFICULTY-LEVELS with, say, an integer value from 0 to 10.
     human_player_white = True
-    human_player_black = False
+    human_player_black = True
 
     print_mate_once = False
 
