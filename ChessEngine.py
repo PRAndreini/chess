@@ -266,6 +266,7 @@ class GameState:
 
         ## If an en-passant capture is possible, then this is the target-square.
         self.en_passant_possible = ()
+        self.en_passant_possible_log = [self.en_passant_possible]
 
         ## Defining a field for which deisred-piece to potentially promote a pawn.
         self.desired_promo_piece = "Q"
@@ -334,6 +335,9 @@ class GameState:
                 self.board[m.end_r][m.end_c+1] = self.board[m.end_r][m.end_c-2]  ## Moves (copies) rook to NEW square.
                 self.board[m.end_r][m.end_c-2] = "--"  ## Deletes rook from OLD square.
 
+        ## Update the possibility of en-passant.
+        self.en_passant_possible_log.append(self.en_passant_possible)
+
         ## Update the castling rights as appropriate whenever a ROOK or a KING moves.
         self.update_castling_rights(m)
         self.castling_rights_log.append(
@@ -364,11 +368,10 @@ class GameState:
             if m.is_en_passant:
                 self.board[m.end_r][m.end_c] = "--"  ## Removes the pawn from the wrong square.
                 self.board[m.start_r][m.end_c] = m.piece_captured  ## Puts back the captured pawn.
-                self.en_passant_possible = (m.end_r, m.end_c)  ## Allow en-passant to happen on the next move.
 
-            ## Undoing a two-square pawn advance should reset the possibility of en-passant capturing.
-            if (m.piece_moved[1]=="P") and (abs(m.start_r-m.end_r)==2):
-                self.en_passant_possible = ()
+            ## Getting back the old en-passant rights, regardless of whether these values changed.
+            self.en_passant_possible_log.pop()
+            self.en_passant_possible = self.en_passant_possible_log[-1]
 
             ## Getting back the old castling-rights, regardless of whether these values changed.
             self.castling_rights_log.pop()  ## Get rid of new castling-rights from the move we are undoing.
