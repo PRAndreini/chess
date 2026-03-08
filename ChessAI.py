@@ -1,6 +1,6 @@
 """
    By Paul Robert Andreini
-    01 Mar 2026
+    07 Mar 2026
 
    Code here is LOOSELY based on a YouTube tutorial series, whose playlist is visible at the following link:
         https://www.youtube.com/playlist?list=PLBwF487qi8MGU81nDGaeNE1EnNEPYWKY_
@@ -151,7 +151,7 @@ def helper_method_first_call(gs: GameState, vm_list: list()):
 
 def get_move_min_max(gs: GameState, vm_list: list(), depth: int, white_to_move: bool):
     """
-       Finds the best move via a greedy algorithm, but recursively-so, unlike the prior method.
+       Finds the best move via a greedy algorithm, but recursively-so, unlike get_greedy_move(...).
     """
     global next_move
     random.shuffle(vm_list)

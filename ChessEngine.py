@@ -1,11 +1,11 @@
 """
    By Paul Robert Andreini
-    01 Mar 2026
+    07 Mar 2026
 
    Code here is LOOSELY based on a YouTube tutorial series, whose playlist is visible at the following link:
         https://www.youtube.com/playlist?list=PLBwF487qi8MGU81nDGaeNE1EnNEPYWKY_
 
-   This code is for EPISODE 16 (cf., Sharick Ep. 15).
+   This code is for EPISODE 16.
 
    ###########################################################################
 
@@ -181,7 +181,7 @@ class Move:
         ## In PGN, pawn-moves are merely denoted by the start- and end-squares (i.e., no "P").
         if start_piece_type == "P":
             if self.is_en_passant:
-                return f" {rf_start}  x  {rf_end}"
+                return f" {rf_start}  x  {rf_end} (en passant)"
             else:
                 if not end_piece_type == "-":
                     return f" {rf_start}  x  {rf_end}"
@@ -794,11 +794,13 @@ class GameState:
             start_r = 6
             promo_r = 0
             enemy_c = 'b'
+            king_r, king_c = self.white_king_location
         else:
             move_amount = 1
             start_r = 1
             promo_r = 7
             enemy_c = 'w'
+            king_r, king_c = self.black_king_location
 
         ##### ADVANCE #####
 
@@ -831,8 +833,31 @@ class GameState:
                                       is_pawn_promotion=pawn_promotion))
 
                 if (r+move_amount, c-1) == self.en_passant_possible:
-                    moves.append(Move(start_square=(r, c), end_square=(r+move_amount, c-1), b=self.board,
-                                      is_en_passant=True))
+                    attacking_piece_exists = blocking_piece_exists = False
+                    if king_r == r:
+                        if king_c < c:  ## King is LEFT of the pawn to-be-moved (TBM).
+                            ## Inside-range: range of columns between the King and the pawn TBM.
+                            ## Outside-range: range of columns between the pawn TBM and the edge of the board.
+                            inside_range = range(king_c+1, c-1)
+                            outside_range = range(c+1, len(self.board))
+                        else:  ## King is RIGHT of the pawn TBM.
+                            inside_range = range(king_c-1, c, -1)
+                            outside_range = range(c-2, -1, -1)
+
+                        for column in inside_range:
+                            if not self.board[r][column] == "--":  ## If not empty, then a piece BLOCKS the check!
+                                blocking_piece_exists = True
+
+                        for column in outside_range:
+                            piece = self.board[r][column]
+                            if piece[0] == enemy_c and (piece[1]=="R" or piece[1]=="Q"):  ## Attacking piece exists!
+                                attacking_piece_exists = True
+                            elif not piece == "--":
+                                blocking_piece_exists = True
+
+                    if (not attacking_piece_exists) or blocking_piece_exists:
+                        moves.append(Move(start_square=(r, c), end_square=(r+move_amount, c-1), b=self.board,
+                                          is_en_passant=True))
 
         ## RIGHT-capture.
         if c+1 <= len(self.board)-1:
@@ -847,8 +872,31 @@ class GameState:
                                       is_pawn_promotion=pawn_promotion))
 
                 if (r+move_amount, c+1) == self.en_passant_possible:
-                    moves.append(Move(start_square=(r, c), end_square=(r+move_amount, c+1), b=self.board,
-                                      is_en_passant=True))
+                    attacking_piece_exists = blocking_piece_exists = False
+                    if king_r == r:
+                        if king_c < c:  ## King is LEFT of the pawn to-be-moved (TBM).
+                            ## Inside-range: range of columns between the King and the pawn TBM.
+                            ## Outside-range: range of columns between the pawn TBM and the edge of the board.
+                            inside_range = range(king_c+1, c)
+                            outside_range = range(c+2, len(self.board))
+                        else:  ## King is RIGHT of the pawn TBM.
+                            inside_range = range(king_c-1, c+1, -1)
+                            outside_range = range(c-1, -1, -1)
+
+                        for column in inside_range:
+                            if not self.board[r][column] == "--":  ## If not empty, then a piece BLOCKS the check!
+                                blocking_piece_exists = True
+
+                        for column in outside_range:
+                            piece = self.board[r][column]
+                            if piece[0] == enemy_c and (piece[1]=="R" or piece[1]=="Q"):  ## Attacking piece exists!
+                                attacking_piece_exists = True
+                            elif not piece == "--":
+                                blocking_piece_exists = True
+
+                    if (not attacking_piece_exists) or blocking_piece_exists:
+                        moves.append(Move(start_square=(r, c), end_square=(r+move_amount, c+1), b=self.board,
+                                          is_en_passant=True))
 
 
     def get_knight_moves(self, r, c, moves, bad_direction=None):
