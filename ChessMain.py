@@ -38,20 +38,22 @@ ALPHA = 150  ## How opaque do we want highlights to be, on the open set [0, 255]
 
 ## Defining STATIC FUNCTIONS.
 
-def load_piece_images():
+def load_piece_images(sq_size: int):
     """
        Initializes a dictionary (GLOBAL scope) of image files for each piece.
-        This is a RELATIVELY-EXPENSIVE operation; only want to run ONCE in the main.
+        Need to use the "global" keyword to modify a global-variable within the scope of this function.
     """
+    global PIECES
+
     colors = ['w', 'b']
     types = ['P', 'N', 'B', 'R', 'Q', 'K']
 
     for c in colors:
         for t in types:
-            PIECES[f"{c}{t}"] = p.transform.scale(p.image.load(f"pieces/{c}{t}.png"), (SQ_SIZE, SQ_SIZE))
+            PIECES[f"{c}{t}"] = p.transform.scale(p.image.load(f"pieces/{c}{t}.png"), (sq_size, sq_size))
 
 
-def draw_board(win, gs: GameState):
+def draw_board(win, sq_size: int, gs: GameState):
     """
        Draws the squares on the board (from white's perspective).
         N.B. WHICHEVER perspective, the top-left square is ALWAYS light!
@@ -59,7 +61,7 @@ def draw_board(win, gs: GameState):
     for r in range(DIMENSION):
         for c in range(DIMENSION):
             fill_color = COLORS[((r + c) % 2)]
-            p.draw.rect(win, fill_color, p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
+            p.draw.rect(win, fill_color, p.Rect(c*sq_size, r*sq_size, sq_size, sq_size))
 
             ## Labeling the RANKS: upper-left corner of the squares on the left-edge of the board.
             if c == 0:
@@ -68,8 +70,8 @@ def draw_board(win, gs: GameState):
                 font = p.font.SysFont(name="Arial", size=20, bold=True, italic=False)
                 text_object = font.render(rank_number, True, label_color)
                 text_location = p.Rect(0, 0, WIDTH, HEIGHT).move(
-                    (SQ_SIZE - text_object.get_width())/30,
-                    (r * SQ_SIZE) + (SQ_SIZE - text_object.get_height()) / 30
+                    (sq_size - text_object.get_width())/30,
+                    (r * sq_size) + (sq_size - text_object.get_height()) / 30
                 )
                 win.blit(text_object, text_location)
 
@@ -80,13 +82,13 @@ def draw_board(win, gs: GameState):
                 font = p.font.SysFont(name="Arial", size=20, bold=True, italic=False)
                 text_object = font.render(file_letter, True, label_color)
                 text_location = p.Rect(0, 0, WIDTH, HEIGHT).move(
-                    (c * SQ_SIZE) + (SQ_SIZE - text_object.get_width()) * (29 / 30),
-                    (7 * SQ_SIZE) + (SQ_SIZE - text_object.get_height()) * (29/30)
+                    (c * sq_size) + (sq_size - text_object.get_width()) * (29 / 30),
+                    (7 * sq_size) + (sq_size - text_object.get_height()) * (29/30)
                 )
                 win.blit(text_object, text_location)
 
 
-def draw_pieces(win, gs: GameState):
+def draw_pieces(win, sq_size: int, gs: GameState):
     """
        Draws the pieces on top of the squares on the board.
     """
@@ -101,10 +103,10 @@ def draw_pieces(win, gs: GameState):
                 col = c if not gs.flipped else 7 - c
 
                 ## If the square has a piece on it (i.e., NOT empty), then draw it!
-                win.blit(PIECES[piece], p.Rect(col*SQ_SIZE, row*SQ_SIZE, SQ_SIZE, SQ_SIZE))
+                win.blit(PIECES[piece], p.Rect(col*sq_size, row*sq_size, sq_size, sq_size))
 
 
-def highlight_possible_squares(win, gs: GameState, valid_moves, square_selected):
+def highlight_possible_squares(win, sq_size: int, gs: GameState, valid_moves, square_selected):
     """
        Highlights the piece selected (in blue) and available moves (if any) in orange.
         This convenient feature for human players allows one to explore all legal moves for a given piece.
@@ -116,25 +118,25 @@ def highlight_possible_squares(win, gs: GameState, valid_moves, square_selected)
         if gs.board[r][c][0] == ("w" if gs.white_to_move else "b"):
 
             ## Highlight the selected square.
-            s = p.Surface((SQ_SIZE, SQ_SIZE))
+            s = p.Surface((sq_size, sq_size))
             s.set_alpha(ALPHA)  ## Transparency value on the closed set [0, 255]; 0 is transparent, 255 is opaque.
             s.fill(p.Color("blue"))
             if gs.flipped:
-                win.blit(s, ((7-c)*SQ_SIZE, (7-r)*SQ_SIZE))
+                win.blit(s, ((7-c)*sq_size, (7-r)*sq_size))
             else:
-                win.blit(s, (c*SQ_SIZE, r*SQ_SIZE))
+                win.blit(s, (c*sq_size, r*sq_size))
 
             ## If the player can move this piece, then highlight the squares to which it can move (validly).
             s.fill(p.Color("orange"))
             for m in valid_moves:
                 if (m.start_r == r) and (m.start_c == c):
                     if gs.flipped:
-                        win.blit(s, ((7-m.end_c)*SQ_SIZE, (7-m.end_r)*SQ_SIZE))
+                        win.blit(s, ((7-m.end_c)*sq_size, (7-m.end_r)*sq_size))
                     else:
-                        win.blit(s, (m.end_c*SQ_SIZE, m.end_r*SQ_SIZE))
+                        win.blit(s, (m.end_c*sq_size, m.end_r*sq_size))
 
 
-def highlight_most_recent_move(win, gs: GameState):
+def highlight_most_recent_move(win, sq_size: int, gs: GameState):
     """
        Highlights (in yellow) both the starting- and ending-squares for the most-recent move.
         This convenient feature for human players allows one to identify the opponent's most-recent move.
@@ -148,14 +150,14 @@ def highlight_most_recent_move(win, gs: GameState):
         end_c = m.end_c if not gs.flipped else 7 - m.end_c
 
         ## Highlighting the relevant squares in yellow.
-        s = p.Surface((SQ_SIZE, SQ_SIZE))
+        s = p.Surface((sq_size, sq_size))
         s.set_alpha(ALPHA)  ## Transparency value in (0, 255); 0 is transparent, 255 is opaque.
         s.fill(p.Color("yellow"))
-        win.blit(s, (start_c*SQ_SIZE, start_r*SQ_SIZE))
-        win.blit(s, (end_c*SQ_SIZE, end_r*SQ_SIZE))
+        win.blit(s, (start_c*sq_size, start_r*sq_size))
+        win.blit(s, (end_c*sq_size, end_r*sq_size))
 
 
-def animate(m: Move, win, gs, clock):
+def animate(m: Move, win, sq_size: int, gs: GameState, clock):
     """
        Animating a move: making pieces move more slowly/progressively than just disappearing and reappearing.
     """
@@ -173,11 +175,11 @@ def animate(m: Move, win, gs, clock):
         progress_frac = frame / frame_count
         gfx_r, gfx_c = (start_r + (dr*progress_frac), start_c + (dc*progress_frac))
 
-        draw_board(win=win, gs=gs)
-        draw_pieces(win=win, gs=gs)  ## This already draws the piece at its end-square ...
+        draw_board(win=win, sq_size=sq_size, gs=gs)
+        draw_pieces(win=win, sq_size=sq_size, gs=gs)  ## This already draws the piece at its end-square ...
         ## ... so we need to ERASE it by re-drawing the square back over it ...
         color = COLORS[((end_r + end_c) % 2)]
-        end_square = p.Rect(end_c * SQ_SIZE, end_r * SQ_SIZE, SQ_SIZE, SQ_SIZE)
+        end_square = p.Rect(end_c * sq_size, end_r * sq_size, sq_size, sq_size)
         p.draw.rect(win, color, end_square)
         ## ... and we also need to draw back the captured piece (if any) ...
         ##  ... unless it's an "en-passant" move, which would draw a "phantom pawn".
@@ -190,14 +192,14 @@ def animate(m: Move, win, gs, clock):
                 else:
                     epr = end_r - 1
 
-                end_square = p.Rect(end_c * SQ_SIZE, epr * SQ_SIZE, SQ_SIZE, SQ_SIZE)
+                end_square = p.Rect(end_c * sq_size, epr * sq_size, sq_size, sq_size)
 
             win.blit(PIECES[m.piece_captured], end_square)
 
 
         ## Draw the moving piece to complete the animation protocol!
         if m.piece_moved != "--":
-            win.blit(PIECES[m.piece_moved], p.Rect(gfx_c*SQ_SIZE, gfx_r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
+            win.blit(PIECES[m.piece_moved], p.Rect(gfx_c*sq_size, gfx_r*sq_size, sq_size, sq_size))
         p.display.flip()
         clock.tick(MAX_FPS)
 
@@ -232,43 +234,55 @@ def board_flip_str(fl: bool) -> str:
         return "Flipping the board's perspective now: Black --> White at the bottom!"
 
 
-def draw_game_state(win, gs: GameState, vm_list: list[Move], square_selected: tuple):
+def draw_game_state(win, gs: GameState, dynamic_sq_size: int, vm_list: list[Move], square_selected: tuple):
     """
        Performs all the graphics-operations involved in displaying the current GameState object.
     """
-    draw_board(win=win, gs=gs)
-    highlight_possible_squares(win=win, gs=gs, valid_moves=vm_list, square_selected=square_selected)
-    highlight_most_recent_move(win=win, gs=gs)
-    draw_pieces(win=win, gs=gs)
+    draw_board(win=win, sq_size=dynamic_sq_size, gs=gs)
+    highlight_possible_squares(win=win, sq_size=dynamic_sq_size,
+                               gs=gs, valid_moves=vm_list, square_selected=square_selected)
+    highlight_most_recent_move(win=win, sq_size=dynamic_sq_size, gs=gs)
+    draw_pieces(win=win, gs=gs, sq_size=dynamic_sq_size)
 
 #######################################################################################################################
 
 ## Main-driver function.
 def main():
-    window = p.display.set_mode((WIDTH, HEIGHT))
+    ## The argument "RESIZABLE" allows one to resize the window via mouse click-drag.
+    window = p.display.set_mode((WIDTH, HEIGHT), p.constants.RESIZABLE)
+
     clock = p.time.Clock()
     window.fill(p.Color("white"))
 
     gs = GameState()  ## Initializing GameState --> starting a new game.
+    load_piece_images(sq_size=SQ_SIZE)  ## This is COMPUTATIONALLY-EXPENSIVE; only do this if the window-size changes!
+
     valid_moves = gs.get_all_valid_moves()
     move_made = False  ## Flag variable to determine when to call "get_all_valid_moves()" again.
     animated = False  ## Flag variable denoting that an amimation has not yet been produced.
-    load_piece_images()  ## This is a COMPUTATIONALLY-EXPENSIVE OPERATION; only do this ONCE.
-
+    print_mate_once = False
     square_selected = ()  ## Keep track of user's most-recent click. Tuple: (row, col).
     player_clicks = []  ## Keeps track of up-to TWO TUPLES (see above) denoting a player's piece's move.
-
-    print_mate_once = False
 
     running = True
 
     while running:
+        dynamic_width, dynamic_height = window.get_size()
+        dynamic_sq_size = min(dynamic_width, dynamic_height) // DIMENSION
 
         ## Clearing the event queue by getting events of ALL TYPES.
         for e in p.event.get():
 
             if e.type == p.QUIT:
                 running = False
+
+            ##################################################
+
+            ## Handling WINDOW RESIZING.
+            elif e.type == p.VIDEORESIZE:
+                window = p.display.set_mode((e.w, e.h), p.constants.RESIZABLE)  ## Resize the window.
+                dynamic_sq_size = min(e.w, e.h) // DIMENSION  ## Recalculate the square size.
+                load_piece_images(sq_size=dynamic_sq_size)  ## Reload piece images with new size.
 
             ##################################################
 
@@ -324,11 +338,11 @@ def main():
 
                 ## Adding in logic for selecting a given square on the board from a mouse-click.
                 if not gs.flipped:
-                    col = mouse_xy_loc[0] // SQ_SIZE
-                    row = mouse_xy_loc[1] // SQ_SIZE
+                    col = mouse_xy_loc[0] // dynamic_sq_size
+                    row = mouse_xy_loc[1] // dynamic_sq_size
                 else:
-                    col = 7 - (mouse_xy_loc[0] // SQ_SIZE)
-                    row = 7 - (mouse_xy_loc[1] // SQ_SIZE)
+                    col = 7 - (mouse_xy_loc[0] // dynamic_sq_size)
+                    row = 7 - (mouse_xy_loc[1] // dynamic_sq_size)
 
                 ## If player clicks the same square twice: (a) de-select that piece and (b) reset the player clicks.
                 if square_selected == (row, col):
@@ -364,11 +378,12 @@ def main():
         ## Once the player makes his/her move, get new valid moves and reset the flag-variable.
         if move_made:
             if animated:
-                animate(m=gs.move_log[-1], win=window, gs=gs, clock=clock)
+                animate(m=gs.move_log[-1], win=window, sq_size=dynamic_sq_size, gs=gs, clock=clock)
             valid_moves = gs.get_all_valid_moves()
             move_made = False
 
-        draw_game_state(win=window, gs=gs, vm_list=valid_moves, square_selected=square_selected)
+        draw_game_state(win=window, gs=gs, dynamic_sq_size=dynamic_sq_size,
+                        vm_list=valid_moves, square_selected=square_selected)
 
         ## Handling game-ending conditions...
         if gs.checkmate:
