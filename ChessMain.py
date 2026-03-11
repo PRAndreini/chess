@@ -280,8 +280,9 @@ def main():
 
             ## Handling WINDOW RESIZING.
             elif e.type == p.VIDEORESIZE:
-                window = p.display.set_mode((e.w, e.h), p.constants.RESIZABLE)  ## Resize the window.
-                dynamic_sq_size = min(e.w, e.h) // DIMENSION  ## Recalculate the square size.
+                new_size = min(e.w, e.h)
+                window = p.display.set_mode((new_size, new_size), p.constants.RESIZABLE)  ## Resize the window.
+                dynamic_sq_size = new_size // DIMENSION  ## Recalculate the square size.
                 load_piece_images(sq_size=dynamic_sq_size)  ## Reload piece images with new size.
 
             ##################################################
