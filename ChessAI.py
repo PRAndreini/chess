@@ -25,20 +25,38 @@ PIECE_SCORES = {
     "K": 0
 }
 
+## Knights are better in the center.
+knight_scores = [
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 2, 2, 2, 2, 2, 2, 1],
+    [1, 2, 3, 3, 3, 3, 2, 1],
+    [1, 2, 3, 4, 4, 3, 2, 1],
+    [1, 2, 3, 4, 4, 3, 2, 1],
+    [1, 2, 3, 3, 3, 3, 2, 1],
+    [1, 2, 2, 2, 2, 2, 2, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1]
+]
+
+piece_position_scores = {"N": knight_scores}
+
 CHECKMATE = 1000  ## Checkmate is the best-possible move, so set this value very high.
 STALEMATE = 0     ## Stalemate is better than losing, but is not as good as winning.
 
 ## Recursive-depth: how far do we want to go down the tree?
-DEPTH = 3
+DEPTH = 4
 
 
-def get_random_move(vm_list: list()):
+def get_random_move(gs: GameState, vm_list: list()):
     """
        Given a list of valid moves (passed as a parameter), picks one at random.
         NOTE: "random.randint(a, b) is inclusive at BOTH bounds (hence, we need the "-1"), not only the lower bound!
         This is different from almost all other functions in Python3.
     """
-    return vm_list[random.randint(a=0, b=len(vm_list)-1)]
+    try:
+        return vm_list[random.randint(a=0, b=len(vm_list)-1)]
+    except ValueError:
+        gs.stalemate = True
+        return None
 
 
 def score_material(b):
@@ -76,12 +94,19 @@ def score_board(gs: GameState):
 
     score = 0
 
-    for row in gs.board:
-        for square in row:
-            if square[0] == "w":
-                score += PIECE_SCORES[square[1]]
-            elif square[0] == "b":
-                score -= PIECE_SCORES[square[1]]
+    for row in range(len(gs.board)):
+        for col in range(len(gs.board[row])):
+            piece = gs.board[row][col]
+            if not (piece == "--"):
+                ## Score pieces POSITIONALLY, here!
+                piece_position_score = 0
+                if piece[1] == "N":
+                    piece_position_score = piece_position_scores["N"][row][col]
+
+                if piece[0] == "w":
+                    score += PIECE_SCORES[piece[1]] + piece_position_score * 0.9
+                elif piece[0] == "b":
+                    score -= PIECE_SCORES[piece[1]] + piece_position_score * 0.9
 
     return score
 
