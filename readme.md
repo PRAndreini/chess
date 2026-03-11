@@ -17,6 +17,7 @@ To play the game:
 - To play as white (default): click on a piece (it will appear in blue), then click on a valid square to which to move this piece (it will appear in orange); the last move made will appear in yellow.
 - To play as black, white must first make a move (note that you can flip the board to be viewed from black's perspective by pressing the "F" key at any time).
 - Note that, in this (non-AI) version, both players must be humans clicking on pieces and squares.
+- To resize the game-window, click-and-drag with your mouse on any side or any corner of the window.
 - To undo the most-recent move made, press the "Z" key.
 - To clear the board and restart, press the "C" key at any time.
 - By default, all pawns promote to a QUEEN upon reaching the back rank.
