@@ -267,8 +267,8 @@ def main():
 
     ## Defining boolean variables to handle AI.
     ##  LATER: Define DIFFICULTY-LEVELS with, say, an integer value from 0 to 10.
-    human_player_white = True
-    human_player_black = True
+    human_player_white = False
+    human_player_black = False
 
     running = True
 
@@ -398,7 +398,7 @@ def main():
 
             ## Just in case the AI cannot decide which move is "best":
             if ai_move is None:
-                ai_move = get_random_move(vm_list=valid_moves)
+                ai_move = get_random_move(gs=gs, vm_list=valid_moves)
 
             print(ai_move.get_pgn())
             gs.make_move(ai_move)

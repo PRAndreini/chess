@@ -25,6 +25,28 @@ PIECE_SCORES = {
     "K": 0
 }
 
+## Pawns are better in the center.
+white_pawn_scores = [
+    [4, 4, 4, 4, 4, 4, 4, 4],
+    [1, 2, 2, 2, 2, 2, 2, 1],
+    [1, 2, 3, 3, 3, 3, 2, 1],
+    [1, 2, 3, 4, 4, 3, 2, 1],
+    [1, 2, 3, 4, 4, 3, 2, 1],
+    [1, 2, 3, 3, 3, 3, 2, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1],  ## Pawns on their starting ranks are the least-beneficial.
+    [0, 0, 0, 0, 0, 0, 0, 0]   ## White pawns cannot access rank 1.
+]
+black_pawn_scores = [
+    [0, 0, 0, 0, 0, 0, 0, 0],  ## Black pawns cannot access rank 8.
+    [1, 1, 1, 1, 1, 1, 1, 1],  ## Pawns on their starting ranks are the least-beneficial.
+    [1, 2, 3, 3, 3, 3, 2, 1],
+    [1, 2, 3, 4, 4, 3, 2, 1],
+    [1, 2, 3, 4, 4, 3, 2, 1],
+    [1, 2, 3, 3, 3, 3, 2, 1],
+    [1, 2, 2, 2, 2, 2, 2, 1],
+    [4, 4, 4, 4, 4, 4, 4, 4]
+]
+
 ## Knights are better in the center.
 knight_scores = [
     [1, 1, 1, 1, 1, 1, 1, 1],
@@ -37,6 +59,7 @@ knight_scores = [
     [1, 1, 1, 1, 1, 1, 1, 1]
 ]
 
+# piece_position_scores = {"P": pawn_scores, "N": knight_scores}
 piece_position_scores = {"N": knight_scores}
 
 CHECKMATE = 1000  ## Checkmate is the best-possible move, so set this value very high.
@@ -54,7 +77,7 @@ def get_random_move(gs: GameState, vm_list: list()):
     """
     try:
         return vm_list[random.randint(a=0, b=len(vm_list)-1)]
-    except ValueError:
+    except IndexError:
         gs.stalemate = True
         return None
 
