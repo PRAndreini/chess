@@ -13,8 +13,8 @@
 """
 
 ## Importing relevant packages...
-from ChessEngine16 import *
-from ChessAI16 import *
+from ChessEngine17 import *
+from ChessAI17 import *
 import pygame as p
 p.init()
 p.display.set_caption("Chess!")
@@ -54,7 +54,7 @@ def load_piece_images(sq_size: int):
             PIECES[f"{c}{t}"] = p.transform.scale(p.image.load(f"pieces/{c}{t}.png"), (sq_size, sq_size))
 
 
-def draw_board(win, sq_size: int, gs: GameState):
+def draw_board(win, sq_size: int, gs: GameState, offset_x: int=0, offset_y: int=0):
     """
        Draws the squares on the board (from white's perspective).
         N.B. WHICHEVER perspective, the top-left square is ALWAYS light!
@@ -62,7 +62,8 @@ def draw_board(win, sq_size: int, gs: GameState):
     for r in range(DIMENSION):
         for c in range(DIMENSION):
             fill_color = COLORS[((r + c) % 2)]
-            p.draw.rect(win, fill_color, p.Rect(c*sq_size, r*sq_size, sq_size, sq_size))
+            p.draw.rect(win, fill_color,
+                        p.Rect(offset_x + c*sq_size, offset_y + r*sq_size, sq_size, sq_size))
 
             ## Labeling the RANKS: upper-left corner of the squares on the left-edge of the board.
             if c == 0:
@@ -89,7 +90,7 @@ def draw_board(win, sq_size: int, gs: GameState):
                 win.blit(text_object, text_location)
 
 
-def draw_pieces(win, sq_size: int, gs: GameState):
+def draw_pieces(win, sq_size: int, gs: GameState, offset_x: int=0, offset_y: int=0):
     """
        Draws the pieces on top of the squares on the board.
     """
@@ -104,10 +105,12 @@ def draw_pieces(win, sq_size: int, gs: GameState):
                 col = c if not gs.flipped else 7 - c
 
                 ## If the square has a piece on it (i.e., NOT empty), then draw it!
-                win.blit(PIECES[piece], p.Rect(col*sq_size, row*sq_size, sq_size, sq_size))
+                win.blit(PIECES[piece],
+                         p.Rect(offset_x + col * sq_size, offset_y + row * sq_size, sq_size, sq_size))
 
 
-def highlight_possible_squares(win, sq_size: int, gs: GameState, valid_moves, square_selected):
+def highlight_possible_squares(win, sq_size: int, gs: GameState, valid_moves, square_selected,
+                               offset_x: int=0, offset_y: int=0):
     """
        Highlights the piece selected (in blue) and available moves (if any) in orange.
         This convenient feature for human players allows one to explore all legal moves for a given piece.
@@ -132,12 +135,14 @@ def highlight_possible_squares(win, sq_size: int, gs: GameState, valid_moves, sq
             for m in valid_moves:
                 if (m.start_r == r) and (m.start_c == c):
                     if gs.flipped:
-                        win.blit(s, ((7-m.end_c)*sq_size, (7-m.end_r)*sq_size))
+                        win.blit(s, (offset_x + (7 - m.end_c) * sq_size,
+                                     offset_y + (7 - m.end_r) * sq_size))
                     else:
-                        win.blit(s, (m.end_c*sq_size, m.end_r*sq_size))
+                        win.blit(s, (offset_x + m.end_c * sq_size,
+                                     offset_y + m.end_r * sq_size))
 
 
-def highlight_most_recent_move(win, sq_size: int, gs: GameState):
+def highlight_most_recent_move(win, sq_size: int, gs: GameState, offset_x: int=0, offset_y: int=0):
     """
        Highlights (in yellow) both the starting- and ending-squares for the most-recent move.
         This convenient feature for human players allows one to identify the opponent's most-recent move.
@@ -152,13 +157,13 @@ def highlight_most_recent_move(win, sq_size: int, gs: GameState):
 
         ## Highlighting the relevant squares in yellow.
         s = p.Surface((sq_size, sq_size))
-        s.set_alpha(ALPHA)  ## Transparency value in (0, 255); 0 is transparent, 255 is opaque.
+        s.set_alpha(ALPHA)
         s.fill(p.Color("yellow"))
-        win.blit(s, (start_c*sq_size, start_r*sq_size))
-        win.blit(s, (end_c*sq_size, end_r*sq_size))
+        win.blit(s, (offset_x + start_c * sq_size, offset_y + start_r * sq_size))
+        win.blit(s, (offset_x + end_c * sq_size, offset_y + end_r * sq_size))
 
 
-def animate(m: Move, win, sq_size: int, gs: GameState, clock):
+def animate(m: Move, win, sq_size: int, gs: GameState, clock, offset_x: int=0, offset_y: int=0):
     """
        Animating a move: making pieces move more slowly/progressively than just disappearing and reappearing.
     """
@@ -176,11 +181,12 @@ def animate(m: Move, win, sq_size: int, gs: GameState, clock):
         progress_frac = frame / frame_count
         gfx_r, gfx_c = (start_r + (dr*progress_frac), start_c + (dc*progress_frac))
 
-        draw_board(win=win, sq_size=sq_size, gs=gs)
-        draw_pieces(win=win, sq_size=sq_size, gs=gs)  ## This already draws the piece at its end-square ...
+        draw_board(win=win, sq_size=sq_size, gs=gs, offset_x=offset_x, offset_y=offset_y)
+        draw_pieces(win=win, sq_size=sq_size, gs=gs, offset_x=offset_x, offset_y=offset_y)
+        ## This already draws the piece at its end-square ...
         ## ... so we need to ERASE it by re-drawing the square back over it ...
         color = COLORS[((end_r + end_c) % 2)]
-        end_square = p.Rect(end_c * sq_size, end_r * sq_size, sq_size, sq_size)
+        end_square = p.Rect(offset_x + end_c * sq_size, offset_y + end_r * sq_size, sq_size, sq_size)
         p.draw.rect(win, color, end_square)
         ## ... and we also need to draw back the captured piece (if any) ...
         ##  ... unless it's an "en-passant" move, which would draw a "phantom pawn".
@@ -235,15 +241,16 @@ def board_flip_str(fl: bool) -> str:
         return "Flipping the board's perspective now: Black --> White at the bottom!"
 
 
-def draw_game_state(win, gs: GameState, dynamic_sq_size: int, vm_list: list[Move], square_selected: tuple):
+def draw_game_state(win, gs, dynamic_sq_size, vm_list, square_selected, offset_x=0, offset_y=0):
     """
        Performs all the graphics-operations involved in displaying the current GameState object.
     """
-    draw_board(win=win, sq_size=dynamic_sq_size, gs=gs)
+    draw_board(win=win, sq_size=dynamic_sq_size, gs=gs, offset_x=offset_x, offset_y=offset_y)
     highlight_possible_squares(win=win, sq_size=dynamic_sq_size,
-                               gs=gs, valid_moves=vm_list, square_selected=square_selected)
-    highlight_most_recent_move(win=win, sq_size=dynamic_sq_size, gs=gs)
-    draw_pieces(win=win, gs=gs, sq_size=dynamic_sq_size)
+                               gs=gs, valid_moves=vm_list, square_selected=square_selected,
+                               offset_x=offset_x, offset_y=offset_y)
+    highlight_most_recent_move(win=win, sq_size=dynamic_sq_size, gs=gs, offset_x=offset_x, offset_y=offset_y)
+    draw_pieces(win=win, gs=gs, sq_size=dynamic_sq_size, offset_x=offset_x, offset_y=offset_y)
 
 #######################################################################################################################
 
@@ -275,6 +282,9 @@ def main():
     while running:
         dynamic_width, dynamic_height = window.get_size()
         dynamic_sq_size = min(dynamic_width, dynamic_height) // DIMENSION
+        board_pixel_size = dynamic_sq_size * DIMENSION
+        offset_x = (dynamic_width - board_pixel_size) // 2
+        offset_y = (dynamic_height - board_pixel_size) // 2
 
         ## Is it (not?) a human's turn to play?
         ##  Currently, the game will be UNRESPONSIVE while the AI thinks of its next move!
@@ -417,8 +427,10 @@ def main():
             valid_moves = gs.get_all_valid_moves()
             move_made = False
 
+        window.fill(p.Color("gray"))
         draw_game_state(win=window, gs=gs, dynamic_sq_size=dynamic_sq_size,
-                        vm_list=valid_moves, square_selected=square_selected)
+                        vm_list=valid_moves, square_selected=square_selected,
+                        offset_x=offset_x, offset_y=offset_y)
 
         ## Handling game-ending conditions...
         if gs.checkmate:
