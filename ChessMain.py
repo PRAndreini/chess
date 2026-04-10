@@ -13,8 +13,8 @@
 """
 
 ## Importing relevant packages...
-from ChessEngine import *
-from ChessAI import *
+from ChessEngine16 import *
+from ChessAI16 import *
 import pygame as p
 p.init()
 p.display.set_caption("Chess!")
@@ -267,7 +267,7 @@ def main():
 
     ## Defining boolean variables to handle AI.
     ##  LATER: Define DIFFICULTY-LEVELS with, say, an integer value from 0 to 10.
-    human_player_white = False
+    human_player_white = True
     human_player_black = False
 
     running = True
@@ -394,16 +394,21 @@ def main():
         ##  Conditional-statements here make sure (a) the game is not over AND (b) the human is not playing.
         if (not gs.checkmate) and (not gs.stalemate) and (not is_humans_turn):
             valid_moves = gs.get_all_valid_moves()  ## Testing this line here, to get all AI move. Might slow down...
-            ai_move = helper_method_first_call(gs=gs, vm_list=valid_moves)
 
-            ## Just in case the AI cannot decide which move is "best":
-            if ai_move is None:
-                ai_move = get_random_move(gs=gs, vm_list=valid_moves)
+            ## Bail out if the game just ended.
+            if gs.checkmate or gs.stalemate:
+                move_made = False
+            else:
+                ai_move = helper_method_first_call(gs=gs, vm_list=valid_moves)
 
-            print(ai_move.get_pgn())
-            gs.make_move(ai_move)
-            move_made = True
-            animated = True
+                if ai_move is None:
+                    ai_move = get_random_move(gs=gs, vm_list=valid_moves)
+
+                if ai_move is not None:
+                    print(ai_move.get_pgn())
+                    gs.make_move(ai_move)
+                    move_made = True
+                    animated = True
 
         ## Once the player makes his/her move, get new valid moves and reset the flag-variable.
         if move_made:
