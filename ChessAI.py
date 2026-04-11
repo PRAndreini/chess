@@ -25,28 +25,6 @@ PIECE_SCORES = {
     "K": 0
 }
 
-## Pawns are better in the center.
-white_pawn_scores = [
-    [4, 4, 4, 4, 4, 4, 4, 4],
-    [1, 2, 2, 2, 2, 2, 2, 1],
-    [1, 2, 3, 3, 3, 3, 2, 1],
-    [1, 2, 3, 4, 4, 3, 2, 1],
-    [1, 2, 3, 4, 4, 3, 2, 1],
-    [1, 2, 3, 3, 3, 3, 2, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1],  ## Pawns on their starting ranks are the least-beneficial.
-    [0, 0, 0, 0, 0, 0, 0, 0]   ## White pawns cannot access rank 1.
-]
-black_pawn_scores = [
-    [0, 0, 0, 0, 0, 0, 0, 0],  ## Black pawns cannot access rank 8.
-    [1, 1, 1, 1, 1, 1, 1, 1],  ## Pawns on their starting ranks are the least-beneficial.
-    [1, 2, 3, 3, 3, 3, 2, 1],
-    [1, 2, 3, 4, 4, 3, 2, 1],
-    [1, 2, 3, 4, 4, 3, 2, 1],
-    [1, 2, 3, 3, 3, 3, 2, 1],
-    [1, 2, 2, 2, 2, 2, 2, 1],
-    [4, 4, 4, 4, 4, 4, 4, 4]
-]
-
 ## Knights are better in the center.
 knight_scores = [
     [1, 1, 1, 1, 1, 1, 1, 1],
@@ -59,27 +37,24 @@ knight_scores = [
     [1, 1, 1, 1, 1, 1, 1, 1]
 ]
 
-# piece_position_scores = {"P": pawn_scores, "N": knight_scores}
 piece_position_scores = {"N": knight_scores}
 
 CHECKMATE = 1000  ## Checkmate is the best-possible move, so set this value very high.
 STALEMATE = 0     ## Stalemate is better than losing, but is not as good as winning.
 
 ## Recursive-depth: how far do we want to go down the tree?
-DEPTH = 4
+DEPTH = 3
 
 
-def get_random_move(gs: GameState, vm_list: list()):
+def get_random_move(vm_list: list()):
     """
        Given a list of valid moves (passed as a parameter), picks one at random.
-        NOTE: "random.randint(a, b) is inclusive at BOTH bounds (hence, we need the "-1"), not only the lower bound!
-        This is different from almost all other functions in Python3.
+        This is a BETTER METHOD than trying to find a random number corresponding to the length of valid moves!
     """
-    try:
-        return vm_list[random.randint(a=0, b=len(vm_list)-1)]
-    except IndexError:
-        gs.stalemate = True
+    if not vm_list:
         return None
+    else:
+        return random.choice(vm_list)
 
 
 def score_material(b):
