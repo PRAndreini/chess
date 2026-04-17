@@ -406,7 +406,7 @@ def main():
                         ##  We use a FOR-LOOP instead of IF-STATEMENT because, in the future, we'll add FLAGS to moves.
                         for j in range(len(valid_moves)):
                             if move == valid_moves[j]:
-                                print(valid_moves[j].get_pgn())
+                                print(valid_moves[j].get_algebraic_notation(gs=gs, vm_list=valid_moves))
                                 gs.make_move(valid_moves[j])
                                 move_made = True
                                 animated = True
@@ -434,7 +434,7 @@ def main():
                     ai_move = get_random_move(gs=gs, vm_list=valid_moves)
 
                 if ai_move is not None:
-                    print(ai_move.get_pgn())
+                    print(ai_move.get_algebraic_notation(gs=gs, vm_list=valid_moves))
                     gs.make_move(ai_move)
                     move_made = True
                     animated = True
