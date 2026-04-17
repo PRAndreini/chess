@@ -22,6 +22,7 @@
     (c) keeping a move log, including determining whose turn it is.
 """
 
+
 class CastlingRights:
     """
        This class is essentially a vessel used to store information about the castling rights of both players
@@ -162,48 +163,74 @@ class Move:
         return self.cols_to_files[c] + self.rows_to_ranks[r]
 
 
-    def get_pgn(self):
+    def get_algebraic_notation(self, gs: 'GameState', vm_list: list):
         """
-           Gets "proper* chess notation" (i.e., PGN, which stands for "Portable Game Notation") for a move given:
-            (a) the type of piece moved;
-            (b) the starting square;
-            (c) the end square.
+           Returns the "algebraic chess notation" for this move:
+            e.g., Nf3, exd5, Rad1, R1d4, Qxe7+, Bxf7#, e8=Q, etc.
 
-           * --> still not quite "proper" algebraic chess notation; this would show checks (+) and checkmates (#).
-            For example, a check would look like: Ng5+; checkmate would look like Ng5#.
-            FIX THIS ISSUE LATER!!
+           The variable "pgn" stands for "Portable Game Notation"; this will be the return-string.
         """
-        start_piece_type = self.board[self.start_r][self.start_c][1]
-        end_piece_type = self.board[self.end_r][self.end_c][1]
-        rf_start = self.get_rank_file(r=self.start_r, c=self.start_c)
-        rf_end = self.get_rank_file(r=self.end_r, c=self.end_c)
+        ## Handling for CASTLE-MOVES:
+        if self.is_castling:
+            ## From white perspective: if the king moves RIGHT, then KING-side Castle; if NOT, then QUEEN-side Castle.
+            pgn = "O-O" if (self.end_c - self.start_c == 2) else "O-O-O"
 
-        ## In PGN, pawn-moves are merely denoted by the start- and end-squares (i.e., no "P").
-        if start_piece_type == "P":
-            if self.is_en_passant:
-                return f" {rf_start}  x  {rf_end} (en passant)"
+        ## Handling for PAWN-MOVES:
+        elif self.piece_moved[1] == "P":
+
+            ## Capture (excluding en-passant):
+            if self.piece_captured != "--":
+                pgn = f"{Move.cols_to_files[self.start_c]}x{self.get_rank_file(self.end_r, self.end_c)}"
+
+            ## "Quiet" advance:
             else:
-                if not end_piece_type == "-":
-                    return f" {rf_start}  x  {rf_end}"
-                else:
-                    return f" {rf_start} --> {rf_end}"
+                pgn = self.get_rank_file(self.end_r, self.end_c)
 
-        ## PGN uses SPECIAL notation for castling-moves: "O - O" for king-side; "O - O - O" for queen-side.
-        elif self.is_castling:
+            ## Pawn-promotion:
+            if self.is_pawn_promotion:
+                pgn += f"={gs.desired_promo_piece}"  ## TODO: support under-promotion choices.
 
-            ## King moving RIGHT (from white's perspective) --> KING-side castle-move.
-            if self.end_c - self.start_c == 2:
-                return "O - O"
-            ## Queen-side castle-move.
-            else:
-                return "O - O - O"
-
-        ## All other pieces are denoted by their type-characters.
+        ## Handling for PIECE-MOVES:
         else:
-            if not end_piece_type == "-":
-                return f"{start_piece_type}{rf_start}  x  {rf_end}"
+            piece_type = self.piece_moved[1]
+
+            ## Disambiguation: find other pieces of the same color/type that can reach the end-square!
+            ambiguous = [
+                m for m in vm_list
+                    if (m.move_id != self.move_id)
+                       and (m.piece_moved == self.piece_moved)
+                       and (m.end_r == self.end_r)
+                       and (m.end_c == self.end_c)
+            ]
+
+            disambiguation = ""  ## Start with nothing; this is the default, if there is no ambiguity.
+            if ambiguous:
+                same_file = any(m.start_c == self.start_c for m in ambiguous)  ## Store any FILE ambiguity.
+                same_rank = any(m.start_r == self.start_r for m in ambiguous)  ## Store any RANK ambiguity.
+
+                if not same_file:
+                    disambiguation = Move.cols_to_files[self.start_c]  ## Appending FILE suffix.
+                elif not same_rank:
+                    disambiguation = Move.rows_to_ranks[self.start_r]  ## Appending RANK suffix.
+                else:
+                    disambiguation = ((Move.cols_to_files[self.start_c])
+                                      + (Move.rows_to_ranks[self.start_r]))  ## Appending BOTH suffices.
+
+            capture = "x" if (not self.piece_captured == "--") else ""
+            pgn = f"{piece_type}{disambiguation}{capture}{self.get_rank_file(self.end_r, self.end_c)}"
+
+        ## Adding suffices for check ("+") and checkmate ("#").
+        ##  Temporarily make a move, inspect the resultant position, then undo.
+        gs.make_move(self)
+        in_check, _, _ = gs.search_for_pins_and_checks()
+        if in_check:
+            if len(gs.get_all_valid_moves()) == 0:
+                pgn += "#"
             else:
-                return f"{start_piece_type}{rf_start} --> {rf_end}"
+                pgn += "+"
+        gs.undo_move()
+
+        return pgn
 
     pass
 
@@ -772,7 +799,7 @@ class GameState:
         return moves
 
 
-    def get_pawn_moves(self, r, c, moves, bad_direction=None):
+    def get_pawn_moves(self, r, c, moves, **_kwargs):
         """
            Returns all valid moves for a PAWN at location (r, c).
         """
@@ -898,7 +925,7 @@ class GameState:
                                           is_en_passant=True))
 
 
-    def get_knight_moves(self, r, c, moves, bad_direction=None):
+    def get_knight_moves(self, r, c, moves, **_kwargs):
         """
            Returns all valid moves for a KNIGHT at location (r, c).
         """
@@ -928,7 +955,7 @@ class GameState:
                         moves.append(Move(start_square=(r, c), end_square=(end_r, end_c), b=self.board))
 
 
-    def get_bishop_moves(self, r, c, moves, bad_direction=None):
+    def get_bishop_moves(self, r, c, moves, **_kwargs):
         """
            Returns all valid moves for a BISHOP at location (r, c).
         """
@@ -974,7 +1001,7 @@ class GameState:
                     break
 
 
-    def get_rook_moves(self, r, c, moves, bad_direction=None):
+    def get_rook_moves(self, r, c, moves, **_kwargs):
         """
            Returns all valid moves for a ROOK at location (r, c).
         """
@@ -1021,7 +1048,7 @@ class GameState:
                     break
 
 
-    def get_queen_moves(self, r, c, moves, bad_direction=None):
+    def get_queen_moves(self, r, c, moves, **_kwargs):
         """
            Returns all valid moves for a QUEEN at location (r, c).
 

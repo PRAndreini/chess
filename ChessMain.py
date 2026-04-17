@@ -382,7 +382,7 @@ def main():
                     ##  We use a FOR-LOOP instead of an IF-STATEMENT because, in the future, we'll add FLAGS to moves.
                     for j in range(len(valid_moves)):
                         if move == valid_moves[j]:
-                            print(valid_moves[j].get_pgn())
+                            print(valid_moves[j].get_algebraic_notation(gs=gs, vm_list=valid_moves))
                             gs.make_move(valid_moves[j])
                             move_made = True
                             animated = True
