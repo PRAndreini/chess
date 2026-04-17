@@ -204,16 +204,35 @@ def animate(m: Move, win, sq_size: int, gs: GameState, clock):
         clock.tick(MAX_FPS)
 
 
-def draw_mate_text(win, message: str):
+def draw_mate_text(win, message: str, pct: float=0.9):
     """
        Writes the appropriate message on screen given a "mate", i.e., at the END of the game.
+        NEW: Font SIZE and POSITION are now RELATIVE to the screen size and location, NOT ABSOLUTE.
     """
-    font = p.font.SysFont(name="Palatino", size=80, bold=True, italic=False)
+    ## Getting (and storing in relevant vars) the width and height of the window object in integer-pixels.
+    win_w, win_h = win.get_size()
+
+    ## Binary-searching for the largest font-size that will still fit within "pct" of the window size.
+    ##  By "casting to int", we essentially implement the "floor function" (from mathematics).
+    target_text_width = int(win_w * pct)
+    lo, hi = 1, win_h  ## Target font-size will never be taller than the square window-height.
+
+    while lo <= hi:
+        mid = (lo + hi) // 2  ## In Python, "x // y" is the same as "floor(x / y)" in mathematics.
+        test_this_font_size = p.font.SysFont(name="Palatino", size=mid, bold=True, italic=False)
+        test_text_width = test_this_font_size.size(message)[0]
+
+        if test_text_width <= target_text_width:
+            lo = mid + 1
+        else:
+            hi = mid - 1
+
+    font_size = hi  ## Largest font-size that fits within "pct" of the total window size.
+    font = p.font.SysFont(name="Palatino", size=font_size, bold=True, italic=False)
     text_object = font.render(message, True, p.Color((0, 100, 195)))  ## Navy blue.
-    text_location = p.Rect(0, 0, WIDTH, HEIGHT).move(
-        (WIDTH - text_object.get_width())/2,
-        (HEIGHT - text_object.get_height())/2
-    )  ## centering text; split into multiple lines to promote CODE READABILITY.
+    text_location = text_object.get_rect(
+        center=(win_w // 2, win_h // 2)
+    )
     win.blit(text_object, text_location)
 
 
