@@ -1,11 +1,13 @@
 """
    By Paul Robert Andreini
-    07 Mar 2026
+    14 Apr 2026
 
    Code here is LOOSELY based on a YouTube tutorial series, whose playlist is visible at the following link:
         https://www.youtube.com/playlist?list=PLBwF487qi8MGU81nDGaeNE1EnNEPYWKY_
+   Although, now, we will be going beyond this tutorial (still leaving the link here for posterity).
+    We will now implement a much faster AND more-accurate algorithm --- on the "Stockfish" engine, (state-of-the-art).
 
-   This code is for EPISODE 16.
+   This code is for EPISODE 22.
 
    ###########################################################################
 
@@ -21,6 +23,11 @@
     (b) determining the valid moves given this state;
     (c) keeping a move log, including determining whose turn it is.
 """
+
+## Importing relevant packages...
+import random
+
+#######################################################################################################################
 
 class CastlingRights:
     """
@@ -243,6 +250,9 @@ class GameState:
             2nd   "   " TYPE:  'P', 'N', 'B', 'R', 'Q', or 'K'.
             NOTE: an EMPTY SPACE is denoted by the string "--".
         """
+        seed = 42
+        rng = random.Random(seed)
+
         ## Defining fields (other than the board) necessary upon instantiation of a new GameState (i.e., a new game).
         self.white_to_move = True  ## White always moves first at the beginning.
         self.move_log = []   ## Keep track of the moves made so, e.g., we can undo them later.
@@ -306,6 +316,56 @@ class GameState:
                            wqs=self.current_castling_rights.wqs,
                            bqs=self.current_castling_rights.bqs)
         ]
+
+        ## Handling the Zobrist hashing; see ChessAI.py (class "ZobristHasher") for an explanation of this technique.
+        self._z_key_side = rng.getrandbits(64)
+        self._z_keys_castle = [rng.getrandbits(64) for _ in range(4)]
+        self._z_key_en_passant = [rng.getrandbits(64) for _ in range(8)]
+
+        self._z_keys_pieces = {}
+        for color in ("w", "b"):
+            for piece_type in ("P", "N", "B", "R", "Q", "K"):
+                for r in range(len(self.board)):
+                    for c in range(len(self.board[r])):
+                        self._z_keys_pieces[(color, piece_type, r, c)] = rng.getrandbits(64)
+
+        self.zobrist_hash = self._compute_full_hash()
+        self._zobrist_hash_log = [self.zobrist_hash]
+
+
+    ## Shadows the method "ZobristHasher.compute_full_hash" in ChessAI.py.
+    def _compute_full_hash(self):
+        """
+           For a complete description, please see "ZobristHasher.compute_full_hash" function in file "ChessAI##.py".
+            This is an INTERNAL/PRIVATE method, as denoted by the leading-underscore.
+        """
+        h = 0  ## Start with nothing.
+
+        for r in range(8):
+            for c in range(8):
+                sq = self.board[r][c]
+
+                ## If there exists a piece on a given square, then XOR it in!
+                if sq != "--":
+                    h ^= self._z_keys_pieces[(sq[0], sq[1], r, c)]
+
+        ## If it is white's turn to move, then XOR it in!
+        if self.white_to_move:
+            h ^= self._z_key_side
+
+        ## If any castling rights still exist, then XOR them in!
+        ccr = self.current_castling_rights
+        if ccr.wks: h ^= self._z_keys_castle[0]
+        if ccr.wqs: h ^= self._z_keys_castle[1]
+        if ccr.bks: h ^= self._z_keys_castle[2]
+        if ccr.bqs: h ^= self._z_keys_castle[3]
+
+        ## If an en-passant capture is possible now, then XOR it in!
+        if self.en_passant_possible:
+            h ^= self._z_key_en_passant[self.en_passant_possible[1]]
+
+        return h
+
 
 
     def flip(self):
@@ -372,6 +432,62 @@ class GameState:
                            wqs=self.current_castling_rights.wqs,
                            bqs=self.current_castling_rights.bqs)
         )
+        
+        ## ── Incremental Zobrist update ──
+        h = self._zobrist_hash_log[-1]
+        
+        ## XOR out the old side-to-move (we already flipped white_to_move,
+        ##  so if it's now Black's turn, White WAS to move → XOR out side_key;
+        ##  if it's now White's turn, Black was to move → XOR in side_key).
+        ## Simplification: XOR toggles, so just always XOR the side key.
+        h ^= self._z_key_side
+        
+        ## XOR out the piece from its old square.
+        h ^= self._z_keys_pieces[(m.piece_moved[0], m.piece_moved[1], m.start_r, m.start_c)]
+        
+        ## If a piece was captured, XOR it out.
+        if m.piece_captured[0] != "-":
+            if m.is_en_passant:
+                ## The captured pawn was on (start_r, end_c), not (end_r, end_c).
+                h ^= self._z_keys_pieces[(m.piece_captured[0], m.piece_captured[1], m.start_r, m.end_c)]
+            else:
+                h ^= self._z_keys_pieces[(m.piece_captured[0], m.piece_captured[1], m.end_r, m.end_c)]
+        
+        ## XOR in the piece on its new square.
+        if m.is_pawn_promotion:
+            h ^= self._z_keys_pieces[(m.piece_moved[0], self.desired_promo_piece, m.end_r, m.end_c)]
+        else:
+            h ^= self._z_keys_pieces[(m.piece_moved[0], m.piece_moved[1], m.end_r, m.end_c)]
+        
+        ## If castling, also move the rook.
+        if m.is_castling:
+            if m.end_c - m.start_c == 2:  ## King-side
+                rook_color = m.piece_moved[0]
+                h ^= self._z_keys_pieces[(rook_color, "R", m.end_r, m.end_c + 1)]  ## XOR out old rook square.
+                h ^= self._z_keys_pieces[(rook_color, "R", m.end_r, m.end_c - 1)]  ## XOR in new rook square.
+            else:  ## Queen-side
+                rook_color = m.piece_moved[0]
+                h ^= self._z_keys_pieces[(rook_color, "R", m.end_r, m.end_c - 2)]  ## XOR out old rook square.
+                h ^= self._z_keys_pieces[(rook_color, "R", m.end_r, m.end_c + 1)]  ## XOR in new rook square.
+        
+        ## XOR out old castling rights, XOR in new ones.
+        old_ccr = self.castling_rights_log[-2]  ## Second-to-last entry = before this move.
+        new_ccr = self.castling_rights_log[-1]  ## Last entry = after this move.
+        for i, (old, new) in enumerate([(old_ccr.wks, new_ccr.wks), (old_ccr.wqs, new_ccr.wqs),
+                                          (old_ccr.bks, new_ccr.bks), (old_ccr.bqs, new_ccr.bqs)]):
+            if old != new:
+                h ^= self._z_keys_castle[i]
+        
+        ## XOR out old en passant, XOR in new one.
+        old_ep = self.en_passant_possible_log[-2] if len(self.en_passant_possible_log) >= 2 else ()
+        new_ep = self.en_passant_possible_log[-1]
+        if old_ep:
+            h ^= self._z_key_en_passant[old_ep[1]]
+        if new_ep:
+            h ^= self._z_key_en_passant[new_ep[1]]
+        
+        self.zobrist_hash = h
+        self._zobrist_hash_log.append(h)
 
 
     def undo_move(self):
