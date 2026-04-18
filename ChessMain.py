@@ -382,7 +382,7 @@ def main():
                     ##  We use a FOR-LOOP instead of an IF-STATEMENT because, in the future, we'll add FLAGS to moves.
                     for j in range(len(valid_moves)):
                         if move == valid_moves[j]:
-                            print(valid_moves[j].get_algebraic_notation(gs=gs, vm_list=valid_moves))
+                            print(gs.get_move_text(m=valid_moves[j], vm_list=valid_moves))
                             gs.make_move(valid_moves[j])
                             move_made = True
                             animated = True
@@ -410,17 +410,17 @@ def main():
             if gs.white_to_move:
                 draw_mate_text(win=window, message="Checkmate! Black wins!")
                 if not print_mate_once:
-                    print("\n0 - 1")
+                    print("\n0 - 1\n")
                     print_mate_once = True
             else:
                 draw_mate_text(win=window, message="Checkmate! White wins!")
                 if not print_mate_once:
-                    print("\n1 - 0")
+                    print("\n1 - 0\n")
                     print_mate_once = True
         elif gs.stalemate:
             draw_mate_text(win=window, message="Stalemate! Nobody wins!")
             if not print_mate_once:
-                print("\n1/2 - 1/2")
+                print("\n1/2 - 1/2\n")
                 print_mate_once = True
 
         clock.tick(MAX_FPS)

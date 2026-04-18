@@ -188,7 +188,7 @@ class Move:
 
             ## Pawn-promotion:
             if self.is_pawn_promotion:
-                pgn += f"={gs.desired_promo_piece}"  ## TODO: support under-promotion choices.
+                pgn += f"={gs.desired_promo_piece}"
 
         ## Handling for PIECE-MOVES:
         else:
@@ -255,6 +255,7 @@ class GameState:
         self.bishop_dirs = [(-1, -1), (-1, 1), (1, -1), (1, 1)]  ## All 4 DIAGONAL dirs.
         self.rook_dirs = [(-1, 0), (0, -1), (1, 0), (0, 1)]  ## All 4 ORTHOGONAL dirs.
         self.king_dirs = [(-1, 0), (0, -1), (1, 0), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]  ## All 8 RADIAL dirs.
+        self.queen_dirs = self.king_dirs[:]  ## All 8 RADIAL dirs; a slice-copy of "self.king_dirs", defined above.
 
         ## Defining a "dict" to tell when different pieces are moved, thus, which specific method to call to get moves.
         self.move_functions = {
@@ -315,6 +316,21 @@ class GameState:
             NOTE: the colors of the squares do not change ("always light bottom-right"), only what we call them!
         """
         self.flipped = not self.flipped
+
+
+    def get_move_text(self, m: Move, vm_list: list) -> str:
+        """
+           Returns the PGN-text to be printed on the console after a move is made.
+            Includes "#. " preceding a white-move and " ... " preceding a black-move.
+        """
+        move_index = len(self.move_log)
+        move_number = (move_index // 2) + 1
+        pgn = m.get_algebraic_notation(gs=self, vm_list=vm_list)
+
+        if not (move_index % 2):
+            return f"{move_number}. {pgn}"
+        else:
+            return f"   ... {pgn}"
 
 
     def make_move(self, m: Move):
@@ -716,16 +732,8 @@ class GameState:
                 check_r = check_info[0]  ## ROW of the enemy piece applying check.
                 check_c = check_info[1]  ## COL  "  "    "    "        "      "
 
-                ## Adding this block of code to fix a bug that lets a player move their King away, remaining in check.
-                check_dir_r = -check_info[2]
-                check_dir_c = -check_info[3]
-                ## The field "avoid" is the direction moving away from a checking-piece (bishop, rook, queen).
-                ##  We do NOT want this direction to be valid, cuz you cannot just move away from a checking-piece.
-                ##  We will pass this information into "get_all_possible_moves", which will pass it to king-moves.
-                avoid = (check_dir_r, check_dir_c)
-
-                ## Now, we proceed to get all possible moves, but considering the direction to avoid for the King.
-                moves = self.get_all_possible_moves(bad_direction=avoid)
+                ## Now, we proceed to get all possible moves.
+                moves = self.get_all_possible_moves()
                 enemy_piece_applying_check = self.board[check_r][check_c]
                 valid_squares = []  ## Empty (for now) list of valid squares for interposition, blocking check.
 
@@ -781,7 +789,7 @@ class GameState:
         return moves
 
 
-    def get_all_possible_moves(self, bad_direction=None):
+    def get_all_possible_moves(self):
         """
            Gets all possible moves for piece regardless of checks and pins.
         """
@@ -794,12 +802,12 @@ class GameState:
                 if (self.white_to_move and piece_color=='w') or (not self.white_to_move and piece_color=='b'):
                     piece_type = self.board[r][c][1]
                     ## Calls move function based on piece type.
-                    self.move_functions[piece_type](r, c, moves, bad_direction=bad_direction)
+                    self.move_functions[piece_type](r, c, moves)
 
         return moves
 
 
-    def get_pawn_moves(self, r, c, moves, **_kwargs):
+    def get_pawn_moves(self, r, c, moves):
         """
            Returns all valid moves for a PAWN at location (r, c).
         """
@@ -925,7 +933,7 @@ class GameState:
                                           is_en_passant=True))
 
 
-    def get_knight_moves(self, r, c, moves, **_kwargs):
+    def get_knight_moves(self, r, c, moves):
         """
            Returns all valid moves for a KNIGHT at location (r, c).
         """
@@ -955,7 +963,7 @@ class GameState:
                         moves.append(Move(start_square=(r, c), end_square=(end_r, end_c), b=self.board))
 
 
-    def get_bishop_moves(self, r, c, moves, **_kwargs):
+    def get_bishop_moves(self, r, c, moves):
         """
            Returns all valid moves for a BISHOP at location (r, c).
         """
@@ -1001,7 +1009,7 @@ class GameState:
                     break
 
 
-    def get_rook_moves(self, r, c, moves, **_kwargs):
+    def get_rook_moves(self, r, c, moves):
         """
            Returns all valid moves for a ROOK at location (r, c).
         """
@@ -1048,7 +1056,7 @@ class GameState:
                     break
 
 
-    def get_queen_moves(self, r, c, moves, **_kwargs):
+    def get_queen_moves(self, r, c, moves):
         """
            Returns all valid moves for a QUEEN at location (r, c).
 
@@ -1069,7 +1077,7 @@ class GameState:
 
         enemy_c = 'b' if self.white_to_move else 'w'
 
-        for dir_j in self.king_dirs:
+        for dir_j in self.queen_dirs:
             for dist_j in range(1, 8):
                 end_r = r + dir_j[0] * dist_j
                 end_c = c + dir_j[1] * dist_j
@@ -1098,19 +1106,19 @@ class GameState:
                     break
 
 
-    def get_king_moves(self, r, c, moves, bad_direction=None):
+    def get_king_moves(self, r, c, moves):
         """
            Returns all valid moves for a KING at location (r, c).
         """
         ally_c = 'w' if self.white_to_move else 'b'
-        dirs = self.king_dirs
 
-        if bad_direction is not None:
-            for dir_j in self.king_dirs:
-                if dir_j == bad_direction:
-                    dirs.remove(dir_j)
+        """
+           While we test for validity locations for the King, TEMPORARILY REMOVE the King from the board so that checks
+            by opponent Bishops/Rooks/Queens are not "blocked" by the "ghost King" (still on its original square).
+        """
+        self.board[r][c] = "--"
 
-        for dir_j in dirs:
+        for dir_j in self.king_dirs:
             end_r = r + dir_j[0]
             end_c = c + dir_j[1]
 
@@ -1125,16 +1133,24 @@ class GameState:
                     else:
                         self.black_king_location = (end_r, end_c)
 
-                    current_player_is_in_check, pins, checks = self.search_for_pins_and_checks()
+                    current_player_is_in_check, _, _ = self.search_for_pins_and_checks()
 
                     if not current_player_is_in_check:
+                        ## RESTORE the King so that Move.__init__(...) appropriately sets Move.piece_moved.
+                        self.board[r][c] = ally_c + "K"
+
                         moves.append(Move(start_square=(r, c), end_square=(end_r, end_c), b=self.board))
 
-                    ## Now, MOVE THE KING BACK to its original location!
-                    if ally_c == "w":
-                        self.white_king_location = (r, c)
-                    else:
-                        self.black_king_location = (r, c)
+                        ## Now, TEMPORARILY re-delete the King.
+                        self.board[r][c] = "--"
+
+        ## Restore the King to its initial position and set the King-location-tracking attributes again.
+        self.board[r][c] = ally_c + "K"
+
+        if ally_c == "w":
+            self.white_king_location = (r, c)
+        else:
+            self.black_king_location = (r, c)
 
         self.get_castling_moves(r, c, moves)
 
