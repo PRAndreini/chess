@@ -55,8 +55,8 @@ def load_piece_images(sq_size: int):
 
 def draw_board(win, sq_size: int, gs: GameState):
     """
-       Draws the squares on the board (from white's perspective).
-        N.B. WHICHEVER perspective, the top-left square is ALWAYS light!
+       Draws the squares on the board (from white's perspective, unless gs.flipped).
+        N.B. the rhyming mnemonic: WHICHEVER perspective, the BOTTOM-RIGHT square is ALWAYS LIGHT!
     """
     for r in range(DIMENSION):
         for c in range(DIMENSION):
@@ -241,8 +241,8 @@ def pawn_promo_console_text(desired_promo_piece: str):
        Returns a string (to be PRINTED ON THE CONSOLE, not shown on the screen) reflecting the player's latest
         choice for a pawn-promotion piece.
     """
-    string = f"\nI will promote all future pawns to a {desired_promo_piece} "
-    string += "unless a player chooses otherwise in the future.\n"
+    string = f"I will promote all future pawns to a {desired_promo_piece} "
+    string += "unless a player chooses otherwise in the future."
     return string
 
 
@@ -317,7 +317,7 @@ def main():
 
                 ## RESET THE BOARD when 'C' key is pressed ('C' for "Clear" the board and restart).
                 if e.key == p.K_c:
-                    print("\nRestarting the game now!\n")
+                    print("Restarting the game now!\n")
                     gs = GameState()
                     valid_moves = gs.get_all_valid_moves()
                     move_made = False

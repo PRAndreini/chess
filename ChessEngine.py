@@ -336,7 +336,6 @@ class GameState:
     def make_move(self, m: Move):
         """
            Given a move (passed as a parameter), make that move.
-            This will NOT work for castling (we will handle this special case later).
         """
         self.board[m.start_r][m.start_c] = "--"
         self.board[m.end_r][m.end_c] = m.piece_moved
@@ -838,7 +837,6 @@ class GameState:
 
         ##### ADVANCE #####
 
-        ## Will NOT work if a pawn reaches "promo_row"; will have to create an "else" statement later, for PROMOTIONS!
         if self.board[r+move_amount][c] == '--':
 
             ## Make sure EITHER (a) this pawn IS NOT PINNED OR (b) it is moving TOWARDS the pinning-piece.
