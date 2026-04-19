@@ -292,6 +292,10 @@ class GameState:
         self.checkmate = False
         self.stalemate = False
 
+        ## Keep track of RESIGNATIONS (i.e., the side-to-move loses the game voluntarily).
+        self.resigned = False
+        self.resigned_message = ""
+
         ## If an en-passant capture is possible, then this is the target-square.
         self.en_passant_possible = ()
         self.en_passant_possible_log = [self.en_passant_possible]

@@ -279,7 +279,8 @@ def main():
     valid_moves = gs.get_all_valid_moves()
     move_made = False  ## Flag variable to determine when to call "get_all_valid_moves()" again.
     animated = False  ## Flag variable denoting that an amimation has not yet been produced.
-    print_mate_once = False
+    print_mate_once = False  ## Flag variable that makes sure the code does not continuous print out the game result.
+    resignation_pending = False  ## Flag variable involved in resigning (i.e., voluntarily-losing) the game.
     square_selected = ()  ## Keep track of user's most-recent click. Tuple: (row, col).
     player_clicks = []  ## Keeps track of up-to TWO TUPLES (see above) denoting a player's piece's move.
 
@@ -309,43 +310,75 @@ def main():
             ## Handling KEY PRESSES.
             elif e.type == p.KEYDOWN:
 
+                ## Any key OTHER than 'Y' cancels a pending resignation.
+                if resignation_pending and e.key != p.K_y:
+                    resignation_pending = False
+                    print("Resignation cancelled.")
+
+                ## RESIGNATION: press 'L' to initiate, then 'Y' to confirm:
+                ##  'L' to "take the L", then 'Y', as in "Yes, I confirm that I want to 'take the L'".
+                if e.key == p.K_l:
+                    if not (gs.checkmate or gs.stalemate or gs.resigned):
+                        resignation_pending = True
+                        who = "White" if gs.white_to_move else "Black"
+                        resignation_string = f"{who} wants to resign. "
+                        resignation_string += "Press 'Y' to confirm your resignation, "
+                        resignation_string += "or any other key (or click the mouse) to cancel."
+                        print(resignation_string)
+
+                ## Pressing 'Y' after 'L' confirms the current player's resignation.
+                elif e.key == p.K_y:
+                    if resignation_pending:
+                        resignation_pending = False
+                        who = "White" if gs.white_to_move else "Black"
+                        winner = "Black" if gs.white_to_move else "White"
+                        gs.resigned_message = f"{who} resigns. {winner} wins!"
+                        gs.resigned = True
+                        print(f"\n{gs.resigned_message}")
+                        draw_mate_text(win=window, message=gs.resigned_message)
+                        print_mate_once = True
+
                 ## UNDO when 'Z' key is pressed.
-                if e.key == p.K_z:
+                elif e.key == p.K_z:
                     gs.undo_move()
                     move_made = True
                     animated = False
+                    ## Without the line below, if mate is achieved, and then undo, next time mate happens the ...
+                    ##  ... computer won't print out the result of the game!
+                    print_mate_once = False
 
                 ## RESET THE BOARD when 'C' key is pressed ('C' for "Clear" the board and restart).
-                if e.key == p.K_c:
+                elif e.key == p.K_c:
                     print("Restarting the game now!\n")
                     gs = GameState()
                     valid_moves = gs.get_all_valid_moves()
                     move_made = False
                     animated = False
+                    resignation_pending = False
                     square_selected = ()
                     player_clicks = []
 
                 ## FLIP THE PERSPECTIVE when 'F' key is pressed (white-to-black and vice versa).
-                if e.key == p.K_f:
+                elif e.key == p.K_f:
                     print(board_flip_str(fl=gs.flipped))
                     gs.flip()
 
                 ##############################################
 
                 ## Setting the character gs.desired_promo_piece to a Queen; a Rook; a Bishop; or a Knight.
-                if e.key == p.K_RETURN:  ## Press "RETURN" to promote to Queen (this is also the default option).
+                elif e.key == p.K_RETURN:  ## Press "RETURN" to promote to Queen (this is also the default option).
                     print(pawn_promo_console_text(desired_promo_piece="Queen"))
                     gs.desired_promo_piece = "Q"
 
-                if e.key == p.K_r:  ## Press "R" to promote to Rook.
+                elif e.key == p.K_r:  ## Press "R" to promote to Rook.
                     print(pawn_promo_console_text(desired_promo_piece="Rook"))
                     gs.desired_promo_piece = "R"
 
-                if e.key == p.K_b:  ## Press "B" to promote to Bishop.
+                elif e.key == p.K_b:  ## Press "B" to promote to Bishop.
                     print(pawn_promo_console_text(desired_promo_piece="Bishop"))
                     gs.desired_promo_piece = "B"
 
-                if e.key == p.K_n:  ## Press "N" to promote to Knight.
+                elif e.key == p.K_n:  ## Press "N" to promote to Knight.
                     print(pawn_promo_console_text(desired_promo_piece="Knight"))
                     gs.desired_promo_piece = "N"
 
@@ -354,6 +387,12 @@ def main():
             ## Handling MOUSE CLICKS; click on a piece and then click on its destination to make a move.
             ##  LATER: add "click-n-drag" functionality!
             elif e.type == p.MOUSEBUTTONDOWN:
+                if resignation_pending:
+                    ## Do not resign if the player clicks the mouse after pressing "L" but before pressing "Y"!
+                    ##  Instead, treat a mouse-click, just like a key-press (other than 'Y') as a cancellation!
+                    resignation_pending = False
+                    print("Resignation cancelled.")
+
                 mouse_xy_loc = p.mouse.get_pos()  ## (x, y) location of mouse click
 
                 ## Adding in logic for selecting a given square on the board from a mouse-click.
@@ -406,7 +445,9 @@ def main():
                         vm_list=valid_moves, square_selected=square_selected)
 
         ## Handling game-ending conditions...
-        if gs.checkmate:
+        if gs.resigned:
+            draw_mate_text(win=window, message=gs.resigned_message)
+        elif gs.checkmate:
             if gs.white_to_move:
                 draw_mate_text(win=window, message="Checkmate! Black wins!")
                 if not print_mate_once:
