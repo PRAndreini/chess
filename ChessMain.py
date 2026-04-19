@@ -332,9 +332,10 @@ def main():
                         resignation_pending = False
                         who = "White" if gs.white_to_move else "Black"
                         winner = "Black" if gs.white_to_move else "White"
+                        result = "0 - 1" if gs.white_to_move else "1 - 0"
                         gs.resigned_message = f"{who} resigns. {winner} wins!"
                         gs.resigned = True
-                        print(f"\n{gs.resigned_message}")
+                        print(f"\n{gs.resigned_message}\n{result}\n")
                         draw_mate_text(win=window, message=gs.resigned_message)
                         print_mate_once = True
 
@@ -346,6 +347,9 @@ def main():
                     ## Without the line below, if mate is achieved, and then undo, next time mate happens the ...
                     ##  ... computer won't print out the result of the game!
                     print_mate_once = False
+                    ## Resetting resignation parameters... We don't have to reset "resignation_pending"; see K_y.
+                    gs.resigned = False
+                    gs.resigned_message = ""
 
                 ## RESET THE BOARD when 'C' key is pressed ('C' for "Clear" the board and restart).
                 elif e.key == p.K_c:
