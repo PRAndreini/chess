@@ -300,6 +300,10 @@ class GameState:
         self.checkmate = False
         self.stalemate = False
 
+        ## Keep track of RESIGNATIONS (i.e., the side-to-move loses the game voluntarily).
+        self.resigned = False
+        self.resigned_message = ""
+
         ## If an en-passant capture is possible, then this is the target-square.
         self.en_passant_possible = ()
         self.en_passant_possible_log = [self.en_passant_possible]
@@ -367,13 +371,27 @@ class GameState:
         return h
 
 
-
     def flip(self):
         """
            Flips the game perspective from White to Black and vice versa.
             NOTE: the colors of the squares do not change ("always light bottom-right"), only what we call them!
         """
         self.flipped = not self.flipped
+
+
+    def get_move_text(self, m: Move, vm_list: list) -> str:
+        """
+           Returns the PGN-text to be printed on the console after a move is made.
+            Includes "#. " preceding a white-move and " ... " preceding a black-move.
+        """
+        move_index = len(self.move_log)
+        move_number = (move_index // 2) + 1
+        pgn = m.get_algebraic_notation(gs=self, vm_list=vm_list)
+
+        if not (move_index % 2):
+            return f"{move_number}. {pgn}"
+        else:
+            return f"   ... {pgn}"
 
 
     def make_move(self, m: Move):
