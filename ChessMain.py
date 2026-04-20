@@ -56,8 +56,8 @@ def load_piece_images(sq_size: int):
 
 def draw_board(win, sq_size: int, gs: GameState, offset_x: int=0, offset_y: int=0):
     """
-       Draws the squares on the board (from white's perspective).
-        N.B. WHICHEVER perspective, the top-left square is ALWAYS light!
+       Draws the squares on the board (from white's perspective, unless gs.flipped).
+        N.B. the rhyming mnemonic: WHICHEVER perspective, the BOTTOM-RIGHT square is ALWAYS LIGHT!
     """
     for r in range(DIMENSION):
         for c in range(DIMENSION):
@@ -248,8 +248,8 @@ def pawn_promo_console_text(desired_promo_piece: str):
        Returns a string (to be PRINTED ON THE CONSOLE, not shown on the screen) reflecting the player's latest
         choice for a pawn-promotion piece.
     """
-    string = f"\nI will promote all future pawns to a {desired_promo_piece} "
-    string += "unless a player chooses otherwise in the future.\n"
+    string = f"I will promote all future pawns to a {desired_promo_piece} "
+    string += "unless a player chooses otherwise in the future."
     return string
 
 
@@ -287,7 +287,8 @@ def main():
     valid_moves = gs.get_all_valid_moves()
     move_made = False  ## Flag variable to determine when to call "get_all_valid_moves()" again.
     animated = False  ## Flag variable denoting that an amimation has not yet been produced.
-    print_mate_once = False
+    print_mate_once = False  ## Flag variable that makes sure the code does not continuous print out the game result.
+    resignation_pending = False  ## Flag variable involved in resigning (i.e., voluntarily-losing) the game.
     square_selected = ()  ## Keep track of user's most-recent click. Tuple: (row, col).
     player_clicks = []  ## Keeps track of up-to TWO TUPLES (see above) denoting a player's piece's move.
 
@@ -330,11 +331,50 @@ def main():
             ## Handling KEY PRESSES.
             elif e.type == p.KEYDOWN:
 
+                ## Resignation-handling...
+
+                ## Any key OTHER than 'Y' cancels a pending resignation.
+                if resignation_pending and e.key != p.K_y:
+                    resignation_pending = False
+                    print("Resignation cancelled.")
+
+                ## RESIGNATION: press 'L' to initiate, then 'Y' to confirm:
+                if e.key == p.K_l:
+                    if not (gs.checkmate or gs.stalemate or gs.resigned):
+                        resignation_pending = True
+                        who = "White" if gs.white_to_move else "Black"
+                        resignation_string = f"{who} wants to resign. "
+                        resignation_string += "Press 'Y' to confirm your resignation, "
+                        resignation_string += "or any other key (or click the mouse) to cancel."
+                        print(resignation_string)
+
+                ## Pressing 'Y' after 'L' confirms the current player's resignation.
+                elif e.key == p.K_y:
+                    if resignation_pending:
+                        resignation_pending = False
+                        who = "White" if gs.white_to_move else "Black"
+                        winner = "Black" if gs.white_to_move else "White"
+                        result = "0 - 1" if gs.white_to_move else "1 - 0"
+                        gs.resigned_message = f"{who} resigns. {winner} wins!"
+                        gs.resigned = True
+                        print(f"\n{gs.resigned_message}\n{result}\n")
+                        draw_mate_text(win=window, message=gs.resigned_message)
+                        print_mate_once = True
+
+                ##############################################
+
                 ## UNDO when 'Z' key is pressed.
                 if e.key == p.K_z:
                     gs.undo_move()
+                    print("Undoing the most-recent move!")
                     move_made = True
                     animated = False
+                    ## Without the line below, if mate is achieved, and then undo, next time mate happens the ...
+                    ##  ... computer won't print out the result of the game!
+                    print_mate_once = False
+                    ## Resetting resignation parameters... We don't have to reset "resignation_pending"; see K_y.
+                    gs.resigned = False
+                    gs.resigned_message = ""
 
                 ## RESET THE BOARD when 'C' key is pressed ('C' for "Clear" the board and restart).
                 if e.key == p.K_c:
@@ -375,6 +415,11 @@ def main():
             ## Handling MOUSE CLICKS; click on a piece and then click on its destination to make a move.
             ##  LATER: add "click-n-drag" functionality!
             elif e.type == p.MOUSEBUTTONDOWN:
+                if resignation_pending:
+                    ## Do not resign if the player clicks the mouse after pressing "L" but before pressing "Y"!
+                    ##  Instead, treat a mouse-click, just like a key-press (other than 'Y') as a cancellation!
+                    resignation_pending = False
+                    print("Resignation cancelled.")
 
                 ## Making sure that it is the human's turn to play.
                 ##  LATER: Make this method ASYNCHRONOUS, so that the player can still interact with the chessboard ...
@@ -406,7 +451,7 @@ def main():
                         ##  We use a FOR-LOOP instead of IF-STATEMENT because, in the future, we'll add FLAGS to moves.
                         for j in range(len(valid_moves)):
                             if move == valid_moves[j]:
-                                print(valid_moves[j].get_algebraic_notation(gs=gs, vm_list=valid_moves))
+                                print(gs.get_move_text(m=valid_moves[j], vm_list=valid_moves))
                                 gs.make_move(valid_moves[j])
                                 move_made = True
                                 animated = True
@@ -434,7 +479,7 @@ def main():
                     ai_move = get_random_move(gs=gs, vm_list=valid_moves)
 
                 if ai_move is not None:
-                    print(ai_move.get_algebraic_notation(gs=gs, vm_list=valid_moves))
+                    print(gs.get_move_text(m=ai_move, vm_list=valid_moves))
                     gs.make_move(ai_move)
                     move_made = True
                     animated = True
@@ -452,21 +497,23 @@ def main():
                         offset_x=offset_x, offset_y=offset_y)
 
         ## Handling game-ending conditions...
-        if gs.checkmate:
+        if gs.resigned:
+            draw_mate_text(win=window, message=gs.resigned_message)
+        elif gs.checkmate:
             if gs.white_to_move:
                 draw_mate_text(win=window, message="Checkmate! Black wins!")
                 if not print_mate_once:
-                    print("\n0 - 1")
+                    print("\n0 - 1\n")
                     print_mate_once = True
             else:
                 draw_mate_text(win=window, message="Checkmate! White wins!")
                 if not print_mate_once:
-                    print("\n1 - 0")
+                    print("\n1 - 0\n")
                     print_mate_once = True
         elif gs.stalemate:
             draw_mate_text(win=window, message="Stalemate! Nobody wins!")
             if not print_mate_once:
-                print("\n1/2 - 1/2")
+                print("\n1/2 - 1/2\n")
                 print_mate_once = True
 
         clock.tick(MAX_FPS)
