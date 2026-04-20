@@ -15,6 +15,7 @@ To play the game:
 - See the rules of chess, such as [Wikipedia: The Rules of Chess](https://en.wikipedia.org/wiki/Rules_of_chess).
 - To resize the game-window, click-and-drag with your mouse on any side or any corner of the window.
 - To flip the board-perspective from Black <-> White, press the "F" key at any time.
+- To RESIGN the game, first press "L"; then press "Y" to confirm. Pressing any key other than "Y", or clicking the mouse, will cancel.
 - To undo the most-recent move made, press the "Z" key.
 - To clear the board and restart, press the "C" key at any time.
 - By default, all pawns promote to a QUEEN upon reaching the back rank.
