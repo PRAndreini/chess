@@ -3,7 +3,7 @@ CHESS-FROM-SCRATCH PACKAGE README (AI version):
 ------------------------------------------------------------------------------------------------------------------------
 
 0. Ensure that you have Python3 installed on your system.
-    - The latest version is always best. This code was written using v. 3.12.9 (although there shouldn't be a problem with using an earlier version of Python3).
+    - The latest version is always best. This code was written using v. 3.12.7 (although there shouldn't be a problem with using an earlier version of Python3).
 1. Download and subsequently-unpack the file "chess.zip".
 2. Open a Terminal and navigate to the file "chess", otherwise open an IDE that can run the .py file.
 3. To play the game, either run in Terminal "python ChessMain.py", or choose your preferred method of running Python3 scripts.
