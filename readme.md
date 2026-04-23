@@ -3,7 +3,7 @@ CHESS-FROM-SCRATCH PACKAGE README (non-AI version):
 __________________________________________________
 
 0.  Ensure that you have Python3 installed on your system.
-    - The latest version is always best. This code was written using v. 3.12.7 (although there shouldn't be a problem with using an earlier version of Python3).
+    - The latest version is always best. This code was written using v. 3.12.9 (although there shouldn't be a problem with using an earlier version of Python3).
 1.  Download and subsequently-unpack the file "chess.zip".
 2.  Open a Terminal and navigate to the file "chess", otherwise open an IDE that can run the .py file.
 3.  To play the game, either run in Terminal "python ChessMain.py", or choose your preferred method of running Python3 scripts.
@@ -19,7 +19,7 @@ To play the game:
 - To resize the game-window, click-and-drag with your mouse on any side or any corner of the window.
 - To undo the most-recent move made, press the "Z" key.
 - To RESIGN the game, first press "L"; then press "Y" to confirm. Pressing any key other than "Y", or clicking the mouse, will cancel.
-- To clear the board and restart, press the "C" key at any time.
+- To clear the board and restart, first press "C" then press "Y" to confirm. Pressing any key other than "Y", or clicking the mouse, will cancel.
 - By default, all pawns promote to a QUEEN upon reaching the back rank.
 - To change this behavior, press the "R" key for a ROOK; "B" for a BISHOP; or "N" for a kNight.
 - After you press a key, all future promotions will become this piece, unless a player presses a different key to change his/her mind.
