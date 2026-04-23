@@ -280,6 +280,7 @@ def main():
     move_made = False  ## Flag variable to determine when to call "get_all_valid_moves()" again.
     animated = False  ## Flag variable denoting that an amimation has not yet been produced.
     print_mate_once = False  ## Flag variable that makes sure the code does not continuous print out the game result.
+    clear_board_pending = False
     resignation_pending = False  ## Flag variable involved in resigning (i.e., voluntarily-losing) the game.
     square_selected = ()  ## Keep track of user's most-recent click. Tuple: (row, col).
     player_clicks = []  ## Keeps track of up-to TWO TUPLES (see above) denoting a player's piece's move.
@@ -310,16 +311,21 @@ def main():
             ## Handling KEY PRESSES.
             elif e.type == p.KEYDOWN:
 
-                ## Any key OTHER than 'Y' cancels a pending resignation.
+                ## Resignation-handling...
+
+                ## Any key OTHER than 'Y' cancels a resignation or board-reset.
                 if resignation_pending and e.key != p.K_y:
                     resignation_pending = False
                     print("Resignation cancelled.")
+                if clear_board_pending and e.key != p.K_y:
+                    clear_board_pending = False
+                    print("Board reset cancelled.")
 
                 ## RESIGNATION: press 'L' to initiate, then 'Y' to confirm:
-                ##  'L' to "take the L", then 'Y', as in "Yes, I confirm that I want to 'take the L'".
                 if e.key == p.K_l:
                     if not (gs.checkmate or gs.stalemate or gs.resigned):
                         resignation_pending = True
+                        clear_board_pending = False
                         who = "White" if gs.white_to_move else "Black"
                         resignation_string = f"{who} wants to resign. "
                         resignation_string += "Press 'Y' to confirm your resignation, "
@@ -338,10 +344,24 @@ def main():
                         print(f"\n{gs.resigned_message}\n{result}\n")
                         draw_mate_text(win=window, message=gs.resigned_message)
                         print_mate_once = True
+                    elif clear_board_pending:
+                        clear_board_pending = False
+                        print("Restarting the game now!\n")
+                        gs = GameState()
+                        valid_moves = gs.get_all_valid_moves()
+                        move_made = False
+                        animated = False
+                        resignation_pending = False
+                        print_mate_once = False
+                        square_selected = ()
+                        player_clicks = []
+
+                ##############################################
 
                 ## UNDO when 'Z' key is pressed.
-                elif e.key == p.K_z:
+                if e.key == p.K_z:
                     gs.undo_move()
+                    print("Undoing the most-recent move!")
                     move_made = True
                     animated = False
                     ## Without the line below, if mate is achieved, and then undo, next time mate happens the ...
@@ -352,15 +372,24 @@ def main():
                     gs.resigned_message = ""
 
                 ## RESET THE BOARD when 'C' key is pressed ('C' for "Clear" the board and restart).
+                ##  Then press the 'Y' key to confirm (unless the game is over).
                 elif e.key == p.K_c:
-                    print("Restarting the game now!\n")
-                    gs = GameState()
-                    valid_moves = gs.get_all_valid_moves()
-                    move_made = False
-                    animated = False
-                    resignation_pending = False
-                    square_selected = ()
-                    player_clicks = []
+                    if not (gs.checkmate or gs.stalemate or gs.resigned):
+                        clear_board_pending = True
+                        resignation_pending = False
+                        print_string = "Are you sure you want to reset the board? "
+                        print_string += "Press 'Y' to confirm, or any other key (or click the mouse) to cancel."
+                        print(print_string)
+                    else:  ## The game is OVER, no need for confirmation, in this case!
+                        print("Restarting the game now!\n")
+                        gs = GameState()
+                        valid_moves = gs.get_all_valid_moves()
+                        move_made = False
+                        animated = False
+                        clear_board_pending = False
+                        resignation_pending = False
+                        square_selected = ()
+                        player_clicks = []
 
                 ## FLIP THE PERSPECTIVE when 'F' key is pressed (white-to-black and vice versa).
                 elif e.key == p.K_f:
@@ -396,6 +425,9 @@ def main():
                     ##  Instead, treat a mouse-click, just like a key-press (other than 'Y') as a cancellation!
                     resignation_pending = False
                     print("Resignation cancelled.")
+                if clear_board_pending:
+                    clear_board_pending = False
+                    print("Board reset cancelled.")
 
                 mouse_xy_loc = p.mouse.get_pos()  ## (x, y) location of mouse click
 
