@@ -15,7 +15,6 @@
 """
 
 ## Importing relevant packages...
-from ChessEngine import *
 from ChessAI import *
 import pygame as p
 p.init()
