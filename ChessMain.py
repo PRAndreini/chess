@@ -311,8 +311,6 @@ def main():
             ## Handling KEY PRESSES.
             elif e.type == p.KEYDOWN:
 
-                ## Resignation-handling...
-
                 ## Any key OTHER than 'Y' cancels a resignation or board-reset.
                 if resignation_pending and e.key != p.K_y:
                     resignation_pending = False
@@ -321,9 +319,22 @@ def main():
                     clear_board_pending = False
                     print("Board reset cancelled.")
 
+                ## Any key OTHER than 'D' or 'Y' DECLINES a draw-offer and resets the turn.
+                if gs.draw_offered and e.key not in (p.K_d, p.K_y):
+                    gs.draw_offered = False
+                    gs.draw_offered_by_white = None
+                    gs.white_to_move = not gs.white_to_move
+                    print("Draw offer declined.")
+
                 ## RESIGNATION: press 'L' to initiate, then 'Y' to confirm:
                 if e.key == p.K_l:
-                    if not (gs.checkmate or gs.stalemate or gs.resigned):
+                    if not (gs.checkmate or gs.stalemate or gs.resigned or gs.draw_agreed):
+                        ## First, cancel any pending draw-offer.
+                        if gs.draw_offered:
+                            gs.draw_offered = False
+                            gs.draw_offered_by_white = None
+                            gs.white_to_move = not gs.white_to_move
+
                         resignation_pending = True
                         clear_board_pending = False
                         who = "White" if gs.white_to_move else "Black"
@@ -332,9 +343,38 @@ def main():
                         resignation_string += "or any other key (or click the mouse) to cancel."
                         print(resignation_string)
 
+                ## DRAW OFFER: press 'D' to INITIATE the draw-offer, then the turn switches.
+                ##  If the other player presses 'D' OR 'Y', then the draw is accepted. Any other key/click declines.
+                ##  If declined, the turn switches back and the game continues as before.
+                elif e.key == p.K_d:
+                    if not (gs.checkmate or gs.stalemate or gs.resigned or gs.draw_agreed):
+                        resignation_pending = False
+                        clear_board_pending = False
+                        if not gs.draw_offered:
+                            ## Offering a draw.
+                            who = "White" if gs.white_to_move else "Black"
+                            gs.draw_offered = True
+                            gs.draw_offered_by_white = gs.white_to_move
+                            ## Switching turns.
+                            gs.white_to_move = not gs.white_to_move
+                            opponent = "White" if gs.white_to_move else "Black"
+                            print_line_1 = f"{who} offers a draw. {opponent}: press 'D' or 'Y' to accept; "
+                            print_line_2 = "any other key (or click the mouse) to cancel."
+                            print(print_line_1 + print_line_2)
+                        else:
+                            ## Opponent pressed 'D' to ACCEPT the draw-offer, then the game ends: 1/2 - 1/2.
+                            gs.draw_agreed = True
+                            gs.draw_message = "Draw! Nobody wins!"
+                            print(f"\n{gs.draw_message}\n1/2 - 1/2\n")
+
                 ## Pressing 'Y' after 'L' confirms the current player's resignation.
                 elif e.key == p.K_y:
-                    if resignation_pending:
+                    if gs.draw_offered:
+                        ## User has pressed 'Y' to agree to a draw that has previously been offered.
+                        gs.draw_agreed = True
+                        gs.draw_message = "Draw! Nobody wins!"
+                        print(f"\n{gs.draw_message}\n1/2 - 1/2\n")
+                    elif resignation_pending:
                         resignation_pending = False
                         who = "White" if gs.white_to_move else "Black"
                         winner = "Black" if gs.white_to_move else "White"
@@ -370,11 +410,16 @@ def main():
                     ## Resetting resignation parameters... We don't have to reset "resignation_pending"; see K_y.
                     gs.resigned = False
                     gs.resigned_message = ""
+                    ## Resetting draw parameters...
+                    gs.draw_offered = False
+                    gs.draw_offered_by_white = None
+                    gs.draw_agreed = False
+                    gs.draw_message = ""
 
                 ## RESET THE BOARD when 'C' key is pressed ('C' for "Clear" the board and restart).
                 ##  Then press the 'Y' key to confirm (unless the game is over).
                 elif e.key == p.K_c:
-                    if not (gs.checkmate or gs.stalemate or gs.resigned):
+                    if not (gs.checkmate or gs.stalemate or gs.resigned or gs.draw_agreed):
                         clear_board_pending = True
                         resignation_pending = False
                         print_string = "Are you sure you want to reset the board? "
@@ -420,6 +465,11 @@ def main():
             ## Handling MOUSE CLICKS; click on a piece and then click on its destination to make a move.
             ##  LATER: add "click-n-drag" functionality!
             elif e.type == p.MOUSEBUTTONDOWN:
+                if gs.draw_offered:
+                    gs.draw_offered = False
+                    gs.draw_offered_by_white = None
+                    gs.white_to_move = not gs.white_to_move
+                    print("Draw offer declined.")
                 if resignation_pending:
                     ## Do not resign if the player clicks the mouse after pressing "L" but before pressing "Y"!
                     ##  Instead, treat a mouse-click, just like a key-press (other than 'Y') as a cancellation!
@@ -483,6 +533,10 @@ def main():
         ## Handling game-ending conditions...
         if gs.resigned:
             draw_mate_text(win=window, message=gs.resigned_message)
+        elif gs.draw_agreed:
+            draw_mate_text(win=window, message=gs.draw_message)
+            if not print_mate_once:
+                print_mate_once = True
         elif gs.checkmate:
             if gs.white_to_move:
                 draw_mate_text(win=window, message="Checkmate! Black wins!")
