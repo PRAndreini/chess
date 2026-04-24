@@ -19,6 +19,7 @@ To play the game:
 - To resize the game-window, click-and-drag with your mouse on any side or any corner of the window.
 - To undo the most-recent move made, press the "Z" key.
 - To RESIGN the game, first press "L"; then press "Y" to confirm. Pressing any key other than "Y", or clicking the mouse, will cancel.
+- To PROPOSE A DRAW, press "D"; the turn then switches to the other player. If that player presses "D" or "Y", then the draw is confirmed; if s/he presses any other key or clicks the mouse, then the draw-offer is cancelled, the turn switches back, and you must make your move.
 - To clear the board and restart, first press "C" then press "Y" to confirm. Pressing any key other than "Y", or clicking the mouse, will cancel.
 - By default, all pawns promote to a QUEEN upon reaching the back rank.
 - To change this behavior, press the "R" key for a ROOK; "B" for a BISHOP; or "N" for a kNight.
