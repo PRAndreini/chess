@@ -583,7 +583,7 @@ class GameState:
     def search_for_attacks(self, r, c, enemy_c) -> bool:
         """
            Searches for enemy pieces that might threaten the square, (r, c), through which one is castling.
-            If NO such threats exist, then 'return True'; if ANY such threats exist, then 'return False'.
+            If ANY such threats exist, then 'return True'; if NO such threats exist, then 'return False'.
         """
         ally_c = "w" if enemy_c == "b" else "b"
 
@@ -1116,18 +1116,19 @@ class GameState:
                 else:
                     break
 
-
-    def get_king_moves(self, r, c, moves, bad_direction=None):
+    def get_king_moves(self, r, c, moves):
         """
            Returns all valid moves for a KING at location (r, c).
         """
         ally_c = 'w' if self.white_to_move else 'b'
-        dirs = self.king_dirs
 
-        if bad_direction is not None:
-            dirs = [dir_j for dir_j in dirs if dir_j != bad_direction]
+        """
+           While we test for validity locations for the King, TEMPORARILY REMOVE the King from the board so that checks
+            by opponent Bishops/Rooks/Queens are not "blocked" by the "ghost King" (still on its original square).
+        """
+        self.board[r][c] = "--"
 
-        for dir_j in dirs:
+        for dir_j in self.king_dirs:
             end_r = r + dir_j[0]
             end_c = c + dir_j[1]
 
@@ -1142,16 +1143,24 @@ class GameState:
                     else:
                         self.black_king_location = (end_r, end_c)
 
-                    current_player_is_in_check, pins, checks = self.search_for_pins_and_checks()
+                    current_player_is_in_check, _, _ = self.search_for_pins_and_checks()
 
                     if not current_player_is_in_check:
+                        ## RESTORE the King so that Move.__init__(...) appropriately sets Move.piece_moved.
+                        self.board[r][c] = ally_c + "K"
+
                         moves.append(Move(start_square=(r, c), end_square=(end_r, end_c), b=self.board))
 
-                    ## Now, MOVE THE KING BACK to its original location!
-                    if ally_c == "w":
-                        self.white_king_location = (r, c)
-                    else:
-                        self.black_king_location = (r, c)
+                        ## Now, TEMPORARILY re-delete the King.
+                        self.board[r][c] = "--"
+
+        ## Restore the King to its initial position and set the King-location-tracking attributes again.
+        self.board[r][c] = ally_c + "K"
+
+        if ally_c == "w":
+            self.white_king_location = (r, c)
+        else:
+            self.black_king_location = (r, c)
 
         self.get_castling_moves(r, c, moves)
 
@@ -1159,27 +1168,21 @@ class GameState:
     def get_castling_moves(self, r, c, moves):
         """
            Generates ALL VALID CASTLING-MOVES for a KING on square (r, c); adds these to the list of valid moves.
-            WILL NEED PARAMETER 'ally_color' for the more-advanced version with 'self.square_under_attack'...
-            viz. https://www.youtube.com/watch?v=jnHlkhYVmqM&list=PLBwF487qi8MGU81nDGaeNE1EnNEPYWKY_&t=2874s
+            New method: since we updated the king- and queen-side methods, we no longer need to search for attacks.
         """
         ## Creating a shorter variable name...
-        w = True if self.white_to_move else False
-        ec = "b" if self.white_to_move else "w"
+        w = self.white_to_move
 
-        ## Essentially, we're using 'search_for_attacks(...)' to see if we're in check!
-        if ((w and self.search_for_attacks(self.white_king_location[0], self.white_king_location[1], ec)) or
-                ((not w) and self.search_for_attacks(self.black_king_location[0], self.black_king_location[1], ec))):
-            return  ## Cannot castle out of check.
+        ## Cannot castle out of check.
+        if self.current_player_is_in_check:
+            return
 
         ## King-side castling.
-        if ((w and self.current_castling_rights.wks and not(self.search_for_attacks(r, c+1, ec))) or
-                ((not w) and self.current_castling_rights.bks)):
+        if (w and self.current_castling_rights.wks) or ((not w) and self.current_castling_rights.bks):
             self.get_king_side_castling_moves(r=r, c=c, moves=moves)
 
         ## Queen-side castling.
-        if ((w and self.current_castling_rights.wqs and
-             not(self.search_for_attacks(r, c-1, ec) or self.search_for_attacks(r, c-2, ec))) or
-                ((not w) and self.current_castling_rights.bqs)):
+        if (w and self.current_castling_rights.wqs) or ((not w) and self.current_castling_rights.bqs):
             self.get_queen_side_castling_moves(r=r, c=c, moves=moves)
 
 
@@ -1193,8 +1196,8 @@ class GameState:
         if (self.board[r][c+1] == "--") and (self.board[r][c+2] == "--"):
 
             ## Yes! They are!
-            ##  Now, are these squares free from attackers?
-            if not ((self.search_for_attacks(r, c+1, ec)) and (self.search_for_attacks(r, c+2, ec))):
+            ##  Now, are these squares free from attackers? (Use "or" keyword; "and" might mess things up!)
+            if not ((self.search_for_attacks(r, c+1, ec)) or (self.search_for_attacks(r, c+2, ec))):
 
                 ## Yes! They are! King-side castling is good-to-go!
                 moves.append(Move(start_square=(r, c), end_square=(r, c+2), b=self.board, is_castling=True))
@@ -1210,8 +1213,8 @@ class GameState:
         if (self.board[r][c-1] == "--") and (self.board[r][c-2] == "--") and (self.board[r][c-3] == "--"):
 
             ## Yes! They are!
-            ##  Now, are these squares free from attackers?
-            if not (self.search_for_attacks(r, c-1, ec) and self.search_for_attacks(r, c-2, ec)):
+            ##  Now, are these squares free from attackers? (Use "or" keyword; "and" might mess things up!)
+            if not (self.search_for_attacks(r, c-1, ec) or self.search_for_attacks(r, c-2, ec)):
 
                 ## Yes! They are! Queen-side castling is good-to-go!
                 moves.append(Move(start_square=(r, c), end_square=(r, c-2), b=self.board, is_castling=True))
@@ -1219,3 +1222,4 @@ class GameState:
     pass
 
 ## E.O.F.
+

@@ -13,8 +13,8 @@
 """
 
 ## Importing relevant packages...
-from ChessEngine import *
-from ChessAI import *
+from ChessEngine16 import *
+from ChessAI16 import *
 import pygame as p
 p.init()
 p.display.set_caption("Chess!")
