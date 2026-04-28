@@ -364,6 +364,8 @@ def main():
                         else:
                             ## Opponent pressed 'D' to ACCEPT the draw-offer, then the game ends: 1/2 - 1/2.
                             gs.draw_agreed = True
+                            gs.draw_offered = False
+                            gs.draw_offered_by_white = None
                             gs.draw_message = "Draw! Nobody wins!"
                             print(f"\n{gs.draw_message}\n1/2 - 1/2\n")
 
@@ -372,6 +374,8 @@ def main():
                     if gs.draw_offered:
                         ## User has pressed 'Y' to agree to a draw that has previously been offered.
                         gs.draw_agreed = True
+                        gs.draw_offered = False
+                        gs.draw_offered_by_white = None
                         gs.draw_message = "Draw! Nobody wins!"
                         print(f"\n{gs.draw_message}\n1/2 - 1/2\n")
                     elif resignation_pending:
