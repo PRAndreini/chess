@@ -319,7 +319,7 @@ def main():
                     clear_board_pending = False
                     print("Board reset cancelled.")
 
-                ## Any key OTHER than 'D' or 'Y' DECLINES a draw-offer and resets the turn.
+                ## Any key OTHER than 'Y' DECLINES a draw-offer and resets the turn.
                 if gs.draw_offered and e.key not in (p.K_d, p.K_y):
                     gs.draw_offered = False
                     gs.draw_offered_by_white = None
@@ -344,7 +344,7 @@ def main():
                         print(resignation_string)
 
                 ## DRAW OFFER: press 'D' to INITIATE the draw-offer, then the turn switches.
-                ##  If the other player presses 'D' OR 'Y', then the draw is accepted. Any other key/click declines.
+                ##  If the other player presses 'Y', then the draw is accepted. Any other key/click declines.
                 ##  If declined, the turn switches back and the game continues as before.
                 elif e.key == p.K_d:
                     if not (gs.checkmate or gs.stalemate or gs.resigned or gs.draw_agreed):
@@ -358,16 +358,9 @@ def main():
                             ## Switching turns.
                             gs.white_to_move = not gs.white_to_move
                             opponent = "White" if gs.white_to_move else "Black"
-                            print_line_1 = f"{who} offers a draw. {opponent}: press 'D' or 'Y' to accept; "
+                            print_line_1 = f"{who} offers a draw. {opponent}: press 'Y' to accept; "
                             print_line_2 = "any other key (or click the mouse) to cancel."
                             print(print_line_1 + print_line_2)
-                        else:
-                            ## Opponent pressed 'D' to ACCEPT the draw-offer, then the game ends: 1/2 - 1/2.
-                            gs.draw_agreed = True
-                            gs.draw_offered = False
-                            gs.draw_offered_by_white = None
-                            gs.draw_message = "Draw! Nobody wins!"
-                            print(f"\n{gs.draw_message}\n1/2 - 1/2\n")
 
                 ## Pressing 'Y' after 'L' confirms the current player's resignation.
                 elif e.key == p.K_y:
@@ -437,6 +430,7 @@ def main():
                         animated = False
                         clear_board_pending = False
                         resignation_pending = False
+                        print_mate_once = False
                         square_selected = ()
                         player_clicks = []
 
