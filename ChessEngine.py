@@ -294,6 +294,21 @@ class GameState:
         self.resigned = False
         self.resigned_message = ""
 
+        ## Keep track of DRAWS (i.e., both sides agree to a stalemate voluntarily).
+        """
+            "draw_pending" is True after a player presses 'D' but BEFORE pressing 'Y' to confirm (same pattern ...
+             ... as "resignation_pending"). It is reset to False on cancellation or confirmation.
+            "draw_offered" is True once a player has fully confirmed (D then Y) a draw offer to the opponent.
+            "draw_offered_by_white" records WHO offered: True if White offered, False if Black offered, None if nobody.
+            "draw_agreed" is True once the opponent has also fully confirmed (D then Y), ending the game.
+            "draw_message" stores the text to display on screen when a draw is agreed.
+        """
+        self.draw_pending = False
+        self.draw_offered = False
+        self.draw_offered_by_white = None
+        self.draw_agreed = False
+        self.draw_message = ""
+
         ## If an en-passant capture is possible, then this is the target-square.
         self.en_passant_possible = ()
         self.en_passant_possible_log = [self.en_passant_possible]
@@ -800,7 +815,7 @@ class GameState:
         return moves
 
 
-    def get_all_possible_moves(self, bad_direction=None):
+    def get_all_possible_moves(self):
         """
            Gets all possible moves for piece regardless of checks and pins.
         """
@@ -813,12 +828,12 @@ class GameState:
                 if (self.white_to_move and piece_color=='w') or (not self.white_to_move and piece_color=='b'):
                     piece_type = self.board[r][c][1]
                     ## Calls move function based on piece type.
-                    self.move_functions[piece_type](r, c, moves, bad_direction=bad_direction)
+                    self.move_functions[piece_type](r, c, moves)
 
         return moves
 
 
-    def get_pawn_moves(self, r, c, moves, bad_direction=None):
+    def get_pawn_moves(self, r, c, moves):
         """
            Returns all valid moves for a PAWN at location (r, c).
         """
@@ -944,7 +959,7 @@ class GameState:
                                           is_en_passant=True))
 
 
-    def get_knight_moves(self, r, c, moves, bad_direction=None):
+    def get_knight_moves(self, r, c, moves):
         """
            Returns all valid moves for a KNIGHT at location (r, c).
         """
@@ -974,7 +989,7 @@ class GameState:
                         moves.append(Move(start_square=(r, c), end_square=(end_r, end_c), b=self.board))
 
 
-    def get_bishop_moves(self, r, c, moves, bad_direction=None):
+    def get_bishop_moves(self, r, c, moves):
         """
            Returns all valid moves for a BISHOP at location (r, c).
         """
@@ -1020,7 +1035,7 @@ class GameState:
                     break
 
 
-    def get_rook_moves(self, r, c, moves, bad_direction=None):
+    def get_rook_moves(self, r, c, moves):
         """
            Returns all valid moves for a ROOK at location (r, c).
         """
@@ -1067,7 +1082,7 @@ class GameState:
                     break
 
 
-    def get_queen_moves(self, r, c, moves, bad_direction=None):
+    def get_queen_moves(self, r, c, moves):
         """
            Returns all valid moves for a QUEEN at location (r, c).
 
@@ -1115,6 +1130,7 @@ class GameState:
                 ## Off the board!
                 else:
                     break
+
 
     def get_king_moves(self, r, c, moves):
         """
