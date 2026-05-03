@@ -15,7 +15,7 @@
 """
 
 ## Importing relevant packages...
-from ChessAI import *
+from ChessAI22 import *
 import pygame as p
 p.init()
 p.display.set_caption("Chess!")
@@ -290,6 +290,7 @@ def main():
     animated = False  ## Flag variable denoting that an amimation has not yet been produced.
     print_mate_once = False  ## Flag variable that makes sure the code does not continuous print out the game result.
     resignation_pending = False  ## Flag variable involved in resigning (i.e., voluntarily-losing) the game.
+    clear_board_pending = False
     square_selected = ()  ## Keep track of user's most-recent click. Tuple: (row, col).
     player_clicks = []  ## Keeps track of up-to TWO TUPLES (see above) denoting a player's piece's move.
 
@@ -332,12 +333,13 @@ def main():
             ## Handling KEY PRESSES.
             elif e.type == p.KEYDOWN:
 
-                ## Resignation-handling...
-
-                ## Any key OTHER than 'Y' cancels a pending resignation.
+                ## Any key OTHER than 'Y' cancels a resignation or board-reset.
                 if resignation_pending and e.key != p.K_y:
                     resignation_pending = False
                     print("Resignation cancelled.")
+                if clear_board_pending and e.key != p.K_y:
+                    clear_board_pending = False
+                    print("Board reset cancelled.")
 
                 ## RESIGNATION: press 'L' to initiate, then 'Y' to confirm:
                 if e.key == p.K_l:
@@ -349,9 +351,42 @@ def main():
                         resignation_string += "or any other key (or click the mouse) to cancel."
                         print(resignation_string)
 
+                ## Any key OTHER than 'Y' DECLINES a draw-offer and resets the turn.
+                if gs.draw_offered and e.key not in (p.K_d, p.K_y):
+                    gs.draw_offered = False
+                    gs.draw_offered_by_white = None
+                    gs.white_to_move = not gs.white_to_move
+                    print("Draw offer declined.")
+
+                ## DRAW OFFER: press 'D' to INITIATE the draw-offer, then the turn switches.
+                ##  If the other player presses 'Y', then the draw is accepted. Any other key/click declines.
+                ##  If declined, the turn switches back and the game continues as before.
+                elif e.key == p.K_d:
+                    if not (gs.checkmate or gs.stalemate or gs.resigned or gs.draw_agreed):
+                        resignation_pending = False
+                        clear_board_pending = False
+                        if not gs.draw_offered:
+                            ## Offering a draw.
+                            who = "White" if gs.white_to_move else "Black"
+                            gs.draw_offered = True
+                            gs.draw_offered_by_white = gs.white_to_move
+                            ## Switching turns.
+                            gs.white_to_move = not gs.white_to_move
+                            opponent = "White" if gs.white_to_move else "Black"
+                            print_line_1 = f"{who} offers a draw. {opponent}: press 'Y' to accept; "
+                            print_line_2 = "any other key (or click the mouse) to cancel."
+                            print(print_line_1 + print_line_2)
+
                 ## Pressing 'Y' after 'L' confirms the current player's resignation.
                 elif e.key == p.K_y:
-                    if resignation_pending:
+                    if gs.draw_offered:
+                        ## User has pressed 'Y' to agree to a draw that has previously been offered.
+                        gs.draw_agreed = True
+                        gs.draw_offered = False
+                        gs.draw_offered_by_white = None
+                        gs.draw_message = "Draw! Nobody wins!"
+                        print(f"\n{gs.draw_message}\n1/2 - 1/2\n")
+                    elif resignation_pending:
                         resignation_pending = False
                         who = "White" if gs.white_to_move else "Black"
                         winner = "Black" if gs.white_to_move else "White"
@@ -361,6 +396,17 @@ def main():
                         print(f"\n{gs.resigned_message}\n{result}\n")
                         draw_mate_text(win=window, message=gs.resigned_message)
                         print_mate_once = True
+                    elif clear_board_pending:
+                        clear_board_pending = False
+                        print("Restarting the game now!\n")
+                        gs = GameState()
+                        valid_moves = gs.get_all_valid_moves()
+                        move_made = False
+                        animated = False
+                        resignation_pending = False
+                        print_mate_once = False
+                        square_selected = ()
+                        player_clicks = []
 
                 ##############################################
 
@@ -376,16 +422,32 @@ def main():
                     ## Resetting resignation parameters... We don't have to reset "resignation_pending"; see K_y.
                     gs.resigned = False
                     gs.resigned_message = ""
+                    ## Resetting draw parameters...
+                    gs.draw_offered = False
+                    gs.draw_offered_by_white = None
+                    gs.draw_agreed = False
+                    gs.draw_message = ""
 
                 ## RESET THE BOARD when 'C' key is pressed ('C' for "Clear" the board and restart).
-                if e.key == p.K_c:
-                    print("\nRestarting the game now!\n")
-                    gs = GameState()
-                    valid_moves = gs.get_all_valid_moves()
-                    move_made = False
-                    animated = False
-                    square_selected = ()
-                    player_clicks = []
+                ##  Then press the 'Y' key to confirm (unless the game is over).
+                elif e.key == p.K_c:
+                    if not (gs.checkmate or gs.stalemate or gs.resigned or gs.draw_agreed):
+                        clear_board_pending = True
+                        resignation_pending = False
+                        print_string = "Are you sure you want to reset the board? "
+                        print_string += "Press 'Y' to confirm, or any other key (or click the mouse) to cancel."
+                        print(print_string)
+                    else:  ## The game is OVER, no need for confirmation, in this case!
+                        print("Restarting the game now!\n")
+                        gs = GameState()
+                        valid_moves = gs.get_all_valid_moves()
+                        move_made = False
+                        animated = False
+                        clear_board_pending = False
+                        resignation_pending = False
+                        print_mate_once = False
+                        square_selected = ()
+                        player_clicks = []
 
                 ## FLIP THE PERSPECTIVE when 'F' key is pressed (white-to-black and vice versa).
                 if e.key == p.K_f:
@@ -411,16 +473,24 @@ def main():
                     print(pawn_promo_console_text(desired_promo_piece="Knight"))
                     gs.desired_promo_piece = "N"
 
-            ##################################################
+                ##################################################
 
             ## Handling MOUSE CLICKS; click on a piece and then click on its destination to make a move.
             ##  LATER: add "click-n-drag" functionality!
             elif e.type == p.MOUSEBUTTONDOWN:
+                if gs.draw_offered:
+                    gs.draw_offered = False
+                    gs.draw_offered_by_white = None
+                    gs.white_to_move = not gs.white_to_move
+                    print("Draw offer declined.")
                 if resignation_pending:
                     ## Do not resign if the player clicks the mouse after pressing "L" but before pressing "Y"!
                     ##  Instead, treat a mouse-click, just like a key-press (other than 'Y') as a cancellation!
                     resignation_pending = False
                     print("Resignation cancelled.")
+                if clear_board_pending:
+                    clear_board_pending = False
+                    print("Board reset cancelled.")
 
                 ## Making sure that it is the human's turn to play.
                 ##  LATER: Make this method ASYNCHRONOUS, so that the player can still interact with the chessboard ...
@@ -500,6 +570,10 @@ def main():
         ## Handling game-ending conditions...
         if gs.resigned:
             draw_mate_text(win=window, message=gs.resigned_message)
+        elif gs.draw_agreed:
+            draw_mate_text(win=window, message=gs.draw_message)
+            if not print_mate_once:
+                print_mate_once = True
         elif gs.checkmate:
             if gs.white_to_move:
                 draw_mate_text(win=window, message="Checkmate! Black wins!")
