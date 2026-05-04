@@ -874,7 +874,7 @@ class GameState:
                 avoid = (check_dir_r, check_dir_c)
 
                 ## Now, we proceed to get all possible moves, but considering the direction to avoid for the King.
-                moves = self.get_all_possible_moves(bad_direction=avoid)
+                moves = self.get_all_possible_moves()
                 enemy_piece_applying_check = self.board[check_r][check_c]
                 valid_squares = []  ## Empty (for now) list of valid squares for interposition, blocking check.
 

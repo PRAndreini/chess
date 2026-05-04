@@ -15,7 +15,7 @@
 """
 
 ## Importing relevant packages...
-from ChessAI22 import *
+from ChessAI import *
 import pygame as p
 p.init()
 p.display.set_caption("Chess!")
