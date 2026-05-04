@@ -13,8 +13,8 @@
 """
 
 ## Importing relevant packages...
-from ChessEngine import *
-from ChessAI import *
+from ChessEngine16 import *
+from ChessAI16 import *
 import pygame as p
 p.init()
 p.display.set_caption("Chess!")
@@ -340,13 +340,6 @@ def main():
                     clear_board_pending = False
                     print("Board reset cancelled.")
 
-                ## Any key OTHER than 'Y' DECLINES a draw-offer and resets the turn.
-                if gs.draw_offered and e.key not in (p.K_d, p.K_y):
-                    gs.draw_offered = False
-                    gs.draw_offered_by_white = None
-                    gs.white_to_move = not gs.white_to_move
-                    print("Draw offer declined.")
-
                 ## RESIGNATION: press 'L' to initiate, then 'Y' to confirm:
                 if e.key == p.K_l:
                     if not (gs.checkmate or gs.stalemate or gs.resigned):
@@ -356,6 +349,13 @@ def main():
                         resignation_string += "Press 'Y' to confirm your resignation, "
                         resignation_string += "or any other key (or click the mouse) to cancel."
                         print(resignation_string)
+
+                ## Any key OTHER than 'Y' DECLINES a draw-offer and resets the turn.
+                if gs.draw_offered and e.key not in (p.K_d, p.K_y):
+                    gs.draw_offered = False
+                    gs.draw_offered_by_white = None
+                    gs.white_to_move = not gs.white_to_move
+                    print("Draw offer declined.")
 
                 ## DRAW OFFER: press 'D' to INITIATE the draw-offer, then the turn switches.
                 ##  If the other player presses 'Y', then the draw is accepted. Any other key/click declines.
@@ -552,7 +552,8 @@ def main():
             move_made = False
 
         draw_game_state(win=window, gs=gs, dynamic_sq_size=dynamic_sq_size,
-                        vm_list=valid_moves, square_selected=square_selected)
+                        vm_list=valid_moves, square_selected=square_selected,
+                        offset_x=offset_x, offset_y=offset_y)
 
         ## Handling game-ending conditions...
         if gs.resigned:

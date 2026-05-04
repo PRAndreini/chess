@@ -749,17 +749,8 @@ class GameState:
                 check_r = check_info[0]  ## ROW of the enemy piece applying check.
                 check_c = check_info[1]  ## COL  "  "    "    "        "      "
 
-                ## Adding this block of code to fix a bug that lets a player move their King away, remaining in check.
-                ########## Only if it's in check from a BISHOP/ROOK/QUEEN! And only in that direction!
-                check_dir_r = -check_info[2]
-                check_dir_c = -check_info[3]
-                ## The field "avoid" is the direction moving away from a checking-piece (bishop, rook, queen).
-                ##  We do NOT want this direction to be valid, cuz you cannot just move away from a checking-piece.
-                ##  We will pass this information into "get_all_possible_moves", which will pass it to king-moves.
-                avoid = (check_dir_r, check_dir_c)
-
                 ## Now, we proceed to get all possible moves, but considering the direction to avoid for the King.
-                moves = self.get_all_possible_moves(bad_direction=avoid)
+                moves = self.get_all_possible_moves()
                 enemy_piece_applying_check = self.board[check_r][check_c]
                 valid_squares = []  ## Empty (for now) list of valid squares for interposition, blocking check.
 
@@ -1238,4 +1229,3 @@ class GameState:
     pass
 
 ## E.O.F.
-
