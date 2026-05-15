@@ -1,0 +1,770 @@
+Perft results — 2026-05-14 18:43:47
+EPD file : standard.epd
+Max depth: 4
+
+
+Line 1: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+  D1: PASS  got=          20  expected=          20  time=  0.00s  (76,542 n/s)
+  D2: PASS  got=         400  expected=         400  time=  0.00s  (117,879 n/s)
+  D3: PASS  got=       8,902  expected=       8,902  time=  0.06s  (146,695 n/s)
+  D4: PASS  got=     197,281  expected=     197,281  time=  1.33s  (148,124 n/s)
+
+Line 2: r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1
+  D1: PASS  got=          48  expected=          48  time=  0.00s  (160,960 n/s)
+  D2: PASS  got=       2,039  expected=       2,039  time=  0.01s  (162,987 n/s)
+  D3: PASS  got=      97,862  expected=      97,862  time=  0.62s  (157,855 n/s)
+  D4: PASS  got=   4,085,603  expected=   4,085,603  time= 28.09s  (145,426 n/s)
+
+Line 3: 4k3/8/8/8/8/8/8/4K2R w K - 0 1
+  D1: PASS  got=          15  expected=          15  time=  0.00s  (106,539 n/s)
+  D2: PASS  got=          66  expected=          66  time=  0.00s  (49,073 n/s)
+  D3: PASS  got=       1,197  expected=       1,197  time=  0.01s  (98,232 n/s)
+  D4: PASS  got=       7,059  expected=       7,059  time=  0.13s  (53,865 n/s)
+
+Line 4: 4k3/8/8/8/8/8/8/R3K3 w Q - 0 1
+  D1: PASS  got=          16  expected=          16  time=  0.00s  (111,856 n/s)
+  D2: PASS  got=          71  expected=          71  time=  0.00s  (45,030 n/s)
+  D3: PASS  got=       1,287  expected=       1,287  time=  0.01s  (111,257 n/s)
+  D4: PASS  got=       7,626  expected=       7,626  time=  0.16s  (48,725 n/s)
+
+Line 5: 4k2r/8/8/8/8/8/8/4K3 w k - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (63,324 n/s)
+  D2: PASS  got=          75  expected=          75  time=  0.00s  (98,382 n/s)
+  D3: PASS  got=         459  expected=         459  time=  0.01s  (52,809 n/s)
+  D4: PASS  got=       8,290  expected=       8,290  time=  0.08s  (106,688 n/s)
+
+Line 6: r3k3/8/8/8/8/8/8/4K3 w q - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (61,760 n/s)
+  D2: PASS  got=          80  expected=          80  time=  0.00s  (88,397 n/s)
+  D3: PASS  got=         493  expected=         493  time=  0.01s  (58,644 n/s)
+  D4: PASS  got=       8,897  expected=       8,897  time=  0.09s  (99,290 n/s)
+
+Line 7: 4k3/8/8/8/8/8/8/R3K2R w KQ - 0 1
+  D1: PASS  got=          26  expected=          26  time=  0.00s  (119,884 n/s)
+  D2: PASS  got=         112  expected=         112  time=  0.00s  (53,056 n/s)
+  D3: PASS  got=       3,189  expected=       3,189  time=  0.02s  (130,062 n/s)
+  D4: PASS  got=      17,945  expected=      17,945  time=  0.37s  (48,788 n/s)
+
+Line 8: r3k2r/8/8/8/8/8/8/4K3 w kq - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (62,111 n/s)
+  D2: PASS  got=         130  expected=         130  time=  0.00s  (113,330 n/s)
+  D3: PASS  got=         782  expected=         782  time=  0.01s  (57,925 n/s)
+  D4: PASS  got=      22,180  expected=      22,180  time=  0.19s  (119,280 n/s)
+
+Line 9: 8/8/8/8/8/8/6k1/4K2R w K - 0 1
+  D1: PASS  got=          12  expected=          12  time=  0.00s  (99,447 n/s)
+  D2: PASS  got=          38  expected=          38  time=  0.00s  (29,268 n/s)
+  D3: PASS  got=         564  expected=         564  time=  0.01s  (83,191 n/s)
+  D4: PASS  got=       2,219  expected=       2,219  time=  0.06s  (35,381 n/s)
+
+Line 10: 8/8/8/8/8/8/1k6/R3K3 w Q - 0 1
+  D1: PASS  got=          15  expected=          15  time=  0.00s  (140,624 n/s)
+  D2: PASS  got=          65  expected=          65  time=  0.00s  (31,711 n/s)
+  D3: PASS  got=       1,018  expected=       1,018  time=  0.01s  (73,717 n/s)
+  D4: PASS  got=       4,573  expected=       4,573  time=  0.11s  (42,038 n/s)
+
+Line 11: 4k2r/6K1/8/8/8/8/8/8 w k - 0 1
+  D1: PASS  got=           3  expected=           3  time=  0.00s  (32,229 n/s)
+  D2: PASS  got=          32  expected=          32  time=  0.00s  (74,795 n/s)
+  D3: PASS  got=         134  expected=         134  time=  0.00s  (36,074 n/s)
+  D4: PASS  got=       2,073  expected=       2,073  time=  0.02s  (101,996 n/s)
+
+Line 12: r3k3/1K6/8/8/8/8/8/8 w q - 0 1
+  D1: PASS  got=           4  expected=           4  time=  0.00s  (41,812 n/s)
+  D2: PASS  got=          49  expected=          49  time=  0.00s  (87,715 n/s)
+  D3: PASS  got=         243  expected=         243  time=  0.01s  (36,466 n/s)
+  D4: PASS  got=       3,991  expected=       3,991  time=  0.04s  (111,667 n/s)
+
+Line 13: r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1
+  D1: PASS  got=          26  expected=          26  time=  0.00s  (125,755 n/s)
+  D2: PASS  got=         568  expected=         568  time=  0.01s  (89,838 n/s)
+  D3: PASS  got=      13,744  expected=      13,744  time=  0.12s  (116,162 n/s)
+  D4: PASS  got=     314,346  expected=     314,346  time=  2.81s  (111,840 n/s)
+
+Line 14: r3k2r/8/8/8/8/8/8/1R2K2R w Kkq - 0 1
+  D1: PASS  got=          25  expected=          25  time=  0.00s  (135,807 n/s)
+  D2: PASS  got=         567  expected=         567  time=  0.00s  (116,439 n/s)
+  D3: PASS  got=      14,095  expected=      14,095  time=  0.12s  (122,118 n/s)
+  D4: PASS  got=     328,965  expected=     328,965  time=  2.85s  (115,387 n/s)
+
+Line 15: r3k2r/8/8/8/8/8/8/2R1K2R w Kkq - 0 1
+  D1: PASS  got=          25  expected=          25  time=  0.00s  (109,031 n/s)
+  D2: PASS  got=         548  expected=         548  time=  0.00s  (134,011 n/s)
+  D3: PASS  got=      13,502  expected=      13,502  time=  0.11s  (127,653 n/s)
+  D4: PASS  got=     312,835  expected=     312,835  time=  2.81s  (111,426 n/s)
+
+Line 16: r3k2r/8/8/8/8/8/8/R3K1R1 w Qkq - 0 1
+  D1: PASS  got=          25  expected=          25  time=  0.00s  (115,562 n/s)
+  D2: PASS  got=         547  expected=         547  time=  0.01s  (104,349 n/s)
+  D3: PASS  got=      13,579  expected=      13,579  time=  0.13s  (107,635 n/s)
+  D4: PASS  got=     316,214  expected=     316,214  time=  2.77s  (114,142 n/s)
+
+Line 17: 1r2k2r/8/8/8/8/8/8/R3K2R w KQk - 0 1
+  D1: PASS  got=          26  expected=          26  time=  0.00s  (125,125 n/s)
+  D2: PASS  got=         583  expected=         583  time=  0.01s  (109,662 n/s)
+  D3: PASS  got=      14,252  expected=      14,252  time=  0.12s  (117,381 n/s)
+  D4: PASS  got=     334,705  expected=     334,705  time=  2.86s  (117,020 n/s)
+
+Line 18: 2r1k2r/8/8/8/8/8/8/R3K2R w KQk - 0 1
+  D1: PASS  got=          25  expected=          25  time=  0.00s  (122,100 n/s)
+  D2: PASS  got=         560  expected=         560  time=  0.00s  (114,318 n/s)
+  D3: PASS  got=      13,592  expected=      13,592  time=  0.12s  (114,585 n/s)
+  D4: PASS  got=     317,324  expected=     317,324  time=  2.72s  (116,699 n/s)
+
+Line 19: r3k1r1/8/8/8/8/8/8/R3K2R w KQq - 0 1
+  D1: PASS  got=          25  expected=          25  time=  0.00s  (127,877 n/s)
+  D2: PASS  got=         560  expected=         560  time=  0.01s  (101,284 n/s)
+  D3: PASS  got=      13,607  expected=      13,607  time=  0.12s  (110,821 n/s)
+  D4: PASS  got=     320,792  expected=     320,792  time=  2.77s  (115,897 n/s)
+
+Line 20: 4k3/8/8/8/8/8/8/4K2R b K - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (60,060 n/s)
+  D2: PASS  got=          75  expected=          75  time=  0.00s  (98,776 n/s)
+  D3: PASS  got=         459  expected=         459  time=  0.01s  (55,386 n/s)
+  D4: PASS  got=       8,290  expected=       8,290  time=  0.08s  (106,529 n/s)
+
+Line 21: 4k3/8/8/8/8/8/8/R3K3 b Q - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (63,158 n/s)
+  D2: PASS  got=          80  expected=          80  time=  0.00s  (96,284 n/s)
+  D3: PASS  got=         493  expected=         493  time=  0.01s  (52,901 n/s)
+  D4: PASS  got=       8,897  expected=       8,897  time=  0.08s  (109,547 n/s)
+
+Line 22: 4k2r/8/8/8/8/8/8/4K3 b k - 0 1
+  D1: PASS  got=          15  expected=          15  time=  0.00s  (105,233 n/s)
+  D2: PASS  got=          66  expected=          66  time=  0.00s  (46,689 n/s)
+  D3: PASS  got=       1,197  expected=       1,197  time=  0.01s  (93,024 n/s)
+  D4: PASS  got=       7,059  expected=       7,059  time=  0.13s  (53,909 n/s)
+
+Line 23: r3k3/8/8/8/8/8/8/4K3 b q - 0 1
+  D1: PASS  got=          16  expected=          16  time=  0.00s  (107,292 n/s)
+  D2: PASS  got=          71  expected=          71  time=  0.00s  (52,119 n/s)
+  D3: PASS  got=       1,287  expected=       1,287  time=  0.01s  (98,493 n/s)
+  D4: PASS  got=       7,626  expected=       7,626  time=  0.16s  (48,112 n/s)
+
+Line 24: 4k3/8/8/8/8/8/8/R3K2R b KQ - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (61,791 n/s)
+  D2: PASS  got=         130  expected=         130  time=  0.00s  (116,222 n/s)
+  D3: PASS  got=         782  expected=         782  time=  0.02s  (51,498 n/s)
+  D4: PASS  got=      22,180  expected=      22,180  time=  0.18s  (125,576 n/s)
+
+Line 25: r3k2r/8/8/8/8/8/8/4K3 b kq - 0 1
+  D1: PASS  got=          26  expected=          26  time=  0.00s  (128,792 n/s)
+  D2: PASS  got=         112  expected=         112  time=  0.00s  (36,850 n/s)
+  D3: PASS  got=       3,189  expected=       3,189  time=  0.03s  (112,298 n/s)
+  D4: PASS  got=      17,945  expected=      17,945  time=  0.36s  (50,353 n/s)
+
+Line 26: 8/8/8/8/8/8/6k1/4K2R b K - 0 1
+  D1: PASS  got=           3  expected=           3  time=  0.00s  (32,490 n/s)
+  D2: PASS  got=          32  expected=          32  time=  0.00s  (66,887 n/s)
+  D3: PASS  got=         134  expected=         134  time=  0.00s  (38,453 n/s)
+  D4: PASS  got=       2,073  expected=       2,073  time=  0.02s  (95,879 n/s)
+
+Line 27: 8/8/8/8/8/8/1k6/R3K3 b Q - 0 1
+  D1: PASS  got=           4  expected=           4  time=  0.00s  (39,344 n/s)
+  D2: PASS  got=          49  expected=          49  time=  0.00s  (84,458 n/s)
+  D3: PASS  got=         243  expected=         243  time=  0.01s  (38,139 n/s)
+  D4: PASS  got=       3,991  expected=       3,991  time=  0.04s  (99,287 n/s)
+
+Line 28: 4k2r/6K1/8/8/8/8/8/8 b k - 0 1
+  D1: PASS  got=          12  expected=          12  time=  0.00s  (101,300 n/s)
+  D2: PASS  got=          38  expected=          38  time=  0.00s  (31,262 n/s)
+  D3: PASS  got=         564  expected=         564  time=  0.01s  (78,350 n/s)
+  D4: PASS  got=       2,219  expected=       2,219  time=  0.06s  (36,402 n/s)
+
+Line 29: r3k3/1K6/8/8/8/8/8/8 b q - 0 1
+  D1: PASS  got=          15  expected=          15  time=  0.00s  (98,846 n/s)
+  D2: PASS  got=          65  expected=          65  time=  0.00s  (40,086 n/s)
+  D3: PASS  got=       1,018  expected=       1,018  time=  0.01s  (94,610 n/s)
+  D4: PASS  got=       4,573  expected=       4,573  time=  0.11s  (43,359 n/s)
+
+Line 30: r3k2r/8/8/8/8/8/8/R3K2R b KQkq - 0 1
+  D1: PASS  got=          26  expected=          26  time=  0.00s  (114,811 n/s)
+  D2: PASS  got=         568  expected=         568  time=  0.01s  (104,842 n/s)
+  D3: PASS  got=      13,744  expected=      13,744  time=  0.12s  (111,681 n/s)
+  D4: PASS  got=     314,346  expected=     314,346  time=  2.74s  (114,625 n/s)
+
+Line 31: r3k2r/8/8/8/8/8/8/1R2K2R b Kkq - 0 1
+  D1: PASS  got=          26  expected=          26  time=  0.00s  (119,016 n/s)
+  D2: PASS  got=         583  expected=         583  time=  0.01s  (106,471 n/s)
+  D3: PASS  got=      14,252  expected=      14,252  time=  0.12s  (119,115 n/s)
+  D4: PASS  got=     334,705  expected=     334,705  time=  2.98s  (112,435 n/s)
+
+Line 32: r3k2r/8/8/8/8/8/8/2R1K2R b Kkq - 0 1
+  D1: PASS  got=          25  expected=          25  time=  0.00s  (119,688 n/s)
+  D2: PASS  got=         560  expected=         560  time=  0.00s  (115,370 n/s)
+  D3: PASS  got=      13,592  expected=      13,592  time=  0.12s  (117,928 n/s)
+  D4: PASS  got=     317,324  expected=     317,324  time=  2.80s  (113,355 n/s)
+
+Line 33: r3k2r/8/8/8/8/8/8/R3K1R1 b Qkq - 0 1
+  D1: PASS  got=          25  expected=          25  time=  0.00s  (153,964 n/s)
+  D2: PASS  got=         560  expected=         560  time=  0.01s  (96,219 n/s)
+  D3: PASS  got=      13,607  expected=      13,607  time=  0.12s  (114,422 n/s)
+  D4: PASS  got=     320,792  expected=     320,792  time=  2.89s  (111,096 n/s)
+
+Line 34: 1r2k2r/8/8/8/8/8/8/R3K2R b KQk - 0 1
+  D1: PASS  got=          25  expected=          25  time=  0.00s  (129,282 n/s)
+  D2: PASS  got=         567  expected=         567  time=  0.01s  (85,531 n/s)
+  D3: PASS  got=      14,095  expected=      14,095  time=  0.11s  (125,003 n/s)
+  D4: PASS  got=     328,965  expected=     328,965  time=  3.30s  (99,535 n/s)
+
+Line 35: 2r1k2r/8/8/8/8/8/8/R3K2R b KQk - 0 1
+  D1: PASS  got=          25  expected=          25  time=  0.00s  (135,226 n/s)
+  D2: PASS  got=         548  expected=         548  time=  0.01s  (108,800 n/s)
+  D3: PASS  got=      13,502  expected=      13,502  time=  0.11s  (119,812 n/s)
+  D4: PASS  got=     312,835  expected=     312,835  time=  2.86s  (109,265 n/s)
+
+Line 36: r3k1r1/8/8/8/8/8/8/R3K2R b KQq - 0 1
+  D1: PASS  got=          25  expected=          25  time=  0.00s  (132,684 n/s)
+  D2: PASS  got=         547  expected=         547  time=  0.01s  (98,767 n/s)
+  D3: PASS  got=      13,579  expected=      13,579  time=  0.11s  (118,159 n/s)
+  D4: PASS  got=     316,214  expected=     316,214  time=  2.71s  (116,602 n/s)
+
+Line 37: 8/1n4N1/2k5/8/8/5K2/1N4n1/8 w - - 0 1
+  D1: PASS  got=          14  expected=          14  time=  0.00s  (90,811 n/s)
+  D2: PASS  got=         195  expected=         195  time=  0.00s  (96,786 n/s)
+  D3: PASS  got=       2,760  expected=       2,760  time=  0.04s  (70,398 n/s)
+  D4: PASS  got=      38,675  expected=      38,675  time=  0.44s  (87,946 n/s)
+
+Line 38: 8/1k6/8/5N2/8/4n3/8/2K5 w - - 0 1
+  D1: PASS  got=          11  expected=          11  time=  0.00s  (97,632 n/s)
+  D2: PASS  got=         156  expected=         156  time=  0.00s  (84,501 n/s)
+  D3: PASS  got=       1,636  expected=       1,636  time=  0.02s  (87,356 n/s)
+  D4: PASS  got=      20,534  expected=      20,534  time=  0.23s  (88,413 n/s)
+
+Line 39: 8/8/4k3/3Nn3/3nN3/4K3/8/8 w - - 0 1
+  D1: PASS  got=          19  expected=          19  time=  0.00s  (121,438 n/s)
+  D2: PASS  got=         289  expected=         289  time=  0.00s  (84,018 n/s)
+  D3: PASS  got=       4,442  expected=       4,442  time=  0.06s  (72,299 n/s)
+  D4: PASS  got=      73,584  expected=      73,584  time=  0.78s  (94,259 n/s)
+
+Line 40: K7/8/2n5/1n6/8/8/8/k6N w - - 0 1
+  D1: PASS  got=           3  expected=           3  time=  0.00s  (52,174 n/s)
+  D2: PASS  got=          51  expected=          51  time=  0.00s  (135,517 n/s)
+  D3: PASS  got=         345  expected=         345  time=  0.00s  (73,348 n/s)
+  D4: PASS  got=       5,301  expected=       5,301  time=  0.05s  (109,270 n/s)
+
+Line 41: k7/8/2N5/1N6/8/8/8/K6n w - - 0 1
+  D1: PASS  got=          17  expected=          17  time=  0.00s  (141,567 n/s)
+  D2: PASS  got=          54  expected=          54  time=  0.00s  (41,244 n/s)
+  D3: PASS  got=         835  expected=         835  time=  0.01s  (94,563 n/s)
+  D4: PASS  got=       5,910  expected=       5,910  time=  0.08s  (75,226 n/s)
+
+Line 42: 8/1n4N1/2k5/8/8/5K2/1N4n1/8 b - - 0 1
+  D1: PASS  got=          15  expected=          15  time=  0.00s  (91,836 n/s)
+  D2: PASS  got=         193  expected=         193  time=  0.00s  (83,295 n/s)
+  D3: PASS  got=       2,816  expected=       2,816  time=  0.03s  (88,697 n/s)
+  D4: PASS  got=      40,039  expected=      40,039  time=  0.48s  (83,667 n/s)
+
+Line 43: 8/1k6/8/5N2/8/4n3/8/2K5 b - - 0 1
+  D1: PASS  got=          16  expected=          16  time=  0.00s  (110,662 n/s)
+  D2: PASS  got=         180  expected=         180  time=  0.00s  (90,338 n/s)
+  D3: PASS  got=       2,290  expected=       2,290  time=  0.03s  (77,428 n/s)
+  D4: PASS  got=      24,640  expected=      24,640  time=  0.30s  (82,300 n/s)
+
+Line 44: 8/8/3K4/3Nn3/3nN3/4k3/8/8 b - - 0 1
+  D1: PASS  got=           4  expected=           4  time=  0.00s  (32,531 n/s)
+  D2: PASS  got=          68  expected=          68  time=  0.00s  (98,384 n/s)
+  D3: PASS  got=       1,118  expected=       1,118  time=  0.01s  (105,902 n/s)
+  D4: PASS  got=      16,199  expected=      16,199  time=  0.18s  (88,853 n/s)
+
+Line 45: K7/8/2n5/1n6/8/8/8/k6N b - - 0 1
+  D1: PASS  got=          17  expected=          17  time=  0.00s  (134,034 n/s)
+  D2: PASS  got=          54  expected=          54  time=  0.00s  (50,085 n/s)
+  D3: PASS  got=         835  expected=         835  time=  0.01s  (90,908 n/s)
+  D4: PASS  got=       5,910  expected=       5,910  time=  0.08s  (73,204 n/s)
+
+Line 46: k7/8/2N5/1N6/8/8/8/K6n b - - 0 1
+  D1: PASS  got=           3  expected=           3  time=  0.00s  (55,427 n/s)
+  D2: PASS  got=          51  expected=          51  time=  0.00s  (135,188 n/s)
+  D3: PASS  got=         345  expected=         345  time=  0.00s  (72,459 n/s)
+  D4: PASS  got=       5,301  expected=       5,301  time=  0.04s  (120,531 n/s)
+
+Line 47: B6b/8/8/8/2K5/4k3/8/b6B w - - 0 1
+  D1: PASS  got=          17  expected=          17  time=  0.00s  (105,209 n/s)
+  D2: PASS  got=         278  expected=         278  time=  0.00s  (91,634 n/s)
+  D3: PASS  got=       4,607  expected=       4,607  time=  0.05s  (90,808 n/s)
+  D4: PASS  got=      76,778  expected=      76,778  time=  0.81s  (94,766 n/s)
+
+Line 48: 8/8/1B6/7b/7k/8/2B1b3/7K w - - 0 1
+  D1: PASS  got=          21  expected=          21  time=  0.00s  (153,612 n/s)
+  D2: PASS  got=         316  expected=         316  time=  0.00s  (107,174 n/s)
+  D3: PASS  got=       5,744  expected=       5,744  time=  0.05s  (115,526 n/s)
+  D4: PASS  got=      93,338  expected=      93,338  time=  0.86s  (108,645 n/s)
+
+Line 49: k7/B7/1B6/1B6/8/8/8/K6b w - - 0 1
+  D1: PASS  got=          21  expected=          21  time=  0.00s  (146,766 n/s)
+  D2: PASS  got=         144  expected=         144  time=  0.00s  (90,606 n/s)
+  D3: PASS  got=       3,242  expected=       3,242  time=  0.02s  (137,313 n/s)
+  D4: PASS  got=      32,955  expected=      32,955  time=  0.33s  (99,380 n/s)
+
+Line 50: K7/b7/1b6/1b6/8/8/8/k6B w - - 0 1
+  D1: PASS  got=           7  expected=           7  time=  0.00s  (88,889 n/s)
+  D2: PASS  got=         143  expected=         143  time=  0.00s  (116,338 n/s)
+  D3: PASS  got=       1,416  expected=       1,416  time=  0.02s  (89,975 n/s)
+  D4: PASS  got=      31,787  expected=      31,787  time=  0.22s  (142,511 n/s)
+
+Line 51: B6b/8/8/8/2K5/5k2/8/b6B b - - 0 1
+  D1: PASS  got=           6  expected=           6  time=  0.00s  (37,402 n/s)
+  D2: PASS  got=         106  expected=         106  time=  0.00s  (84,277 n/s)
+  D3: PASS  got=       1,829  expected=       1,829  time=  0.02s  (82,480 n/s)
+  D4: PASS  got=      31,151  expected=      31,151  time=  0.32s  (96,710 n/s)
+
+Line 52: 8/8/1B6/7b/7k/8/2B1b3/7K b - - 0 1
+  D1: PASS  got=          17  expected=          17  time=  0.00s  (135,412 n/s)
+  D2: PASS  got=         309  expected=         309  time=  0.00s  (102,616 n/s)
+  D3: PASS  got=       5,133  expected=       5,133  time=  0.04s  (118,983 n/s)
+  D4: PASS  got=      93,603  expected=      93,603  time=  0.74s  (127,143 n/s)
+
+Line 53: k7/B7/1B6/1B6/8/8/8/K6b b - - 0 1
+  D1: PASS  got=           7  expected=           7  time=  0.00s  (98,649 n/s)
+  D2: PASS  got=         143  expected=         143  time=  0.00s  (150,374 n/s)
+  D3: PASS  got=       1,416  expected=       1,416  time=  0.01s  (103,452 n/s)
+  D4: PASS  got=      31,787  expected=      31,787  time=  0.23s  (136,966 n/s)
+
+Line 54: K7/b7/1b6/1b6/8/8/8/k6B b - - 0 1
+  D1: PASS  got=          21  expected=          21  time=  0.00s  (158,241 n/s)
+  D2: PASS  got=         144  expected=         144  time=  0.00s  (92,557 n/s)
+  D3: PASS  got=       3,242  expected=       3,242  time=  0.02s  (133,780 n/s)
+  D4: PASS  got=      32,955  expected=      32,955  time=  0.33s  (100,572 n/s)
+
+Line 55: 7k/RR6/8/8/8/8/rr6/7K w - - 0 1
+  D1: PASS  got=          19  expected=          19  time=  0.00s  (151,949 n/s)
+  D2: PASS  got=         275  expected=         275  time=  0.00s  (122,640 n/s)
+  D3: PASS  got=       5,300  expected=       5,300  time=  0.05s  (97,636 n/s)
+  D4: PASS  got=     104,342  expected=     104,342  time=  0.84s  (123,981 n/s)
+
+Line 56: R6r/8/8/2K5/5k2/8/8/r6R w - - 0 1
+  D1: PASS  got=          36  expected=          36  time=  0.00s  (150,130 n/s)
+  D2: PASS  got=       1,027  expected=       1,027  time=  0.01s  (102,649 n/s)
+  D3: PASS  got=      29,215  expected=      29,215  time=  0.26s  (114,358 n/s)
+  D4: PASS  got=     771,461  expected=     771,461  time=  6.97s  (110,755 n/s)
+
+Line 57: 7k/RR6/8/8/8/8/rr6/7K b - - 0 1
+  D1: PASS  got=          19  expected=          19  time=  0.00s  (115,589 n/s)
+  D2: PASS  got=         275  expected=         275  time=  0.00s  (109,027 n/s)
+  D3: PASS  got=       5,300  expected=       5,300  time=  0.04s  (130,188 n/s)
+  D4: PASS  got=     104,342  expected=     104,342  time=  0.83s  (125,479 n/s)
+
+Line 58: R6r/8/8/2K5/5k2/8/8/r6R b - - 0 1
+  D1: PASS  got=          36  expected=          36  time=  0.00s  (139,490 n/s)
+  D2: PASS  got=       1,027  expected=       1,027  time=  0.01s  (119,884 n/s)
+  D3: PASS  got=      29,227  expected=      29,227  time=  0.25s  (117,624 n/s)
+  D4: PASS  got=     771,368  expected=     771,368  time=  6.83s  (113,020 n/s)
+
+Line 59: 6kq/8/8/8/8/8/8/7K w - - 0 1
+  D1: PASS  got=           2  expected=           2  time=  0.00s  (22,716 n/s)
+  D2: PASS  got=          36  expected=          36  time=  0.00s  (81,989 n/s)
+  D3: PASS  got=         143  expected=         143  time=  0.00s  (38,352 n/s)
+  D4: PASS  got=       3,637  expected=       3,637  time=  0.04s  (103,018 n/s)
+
+Line 60: 6KQ/8/8/8/8/8/8/7k b - - 0 1
+  D1: PASS  got=           2  expected=           2  time=  0.00s  (35,555 n/s)
+  D2: PASS  got=          36  expected=          36  time=  0.00s  (116,835 n/s)
+  D3: PASS  got=         143  expected=         143  time=  0.00s  (44,905 n/s)
+  D4: PASS  got=       3,637  expected=       3,637  time=  0.03s  (125,453 n/s)
+
+Line 61: K7/8/8/3Q4/4q3/8/8/7k w - - 0 1
+  D1: PASS  got=           6  expected=           6  time=  0.00s  (78,090 n/s)
+  D2: PASS  got=          35  expected=          35  time=  0.00s  (63,617 n/s)
+  D3: PASS  got=         495  expected=         495  time=  0.01s  (97,441 n/s)
+  D4: PASS  got=       8,349  expected=       8,349  time=  0.08s  (110,045 n/s)
+
+Line 62: 6qk/8/8/8/8/8/8/7K b - - 0 1
+  D1: PASS  got=          22  expected=          22  time=  0.00s  (166,719 n/s)
+  D2: PASS  got=          43  expected=          43  time=  0.00s  (35,819 n/s)
+  D3: PASS  got=       1,015  expected=       1,015  time=  0.01s  (130,584 n/s)
+  D4: PASS  got=       4,167  expected=       4,167  time=  0.11s  (38,836 n/s)
+
+Line 63: 6KQ/8/8/8/8/8/8/7k b - - 0 1
+  D1: PASS  got=           2  expected=           2  time=  0.00s  (25,396 n/s)
+  D2: PASS  got=          36  expected=          36  time=  0.00s  (141,269 n/s)
+  D3: PASS  got=         143  expected=         143  time=  0.00s  (37,563 n/s)
+  D4: PASS  got=       3,637  expected=       3,637  time=  0.03s  (124,905 n/s)
+
+Line 64: K7/8/8/3Q4/4q3/8/8/7k b - - 0 1
+  D1: PASS  got=           6  expected=           6  time=  0.00s  (74,727 n/s)
+  D2: PASS  got=          35  expected=          35  time=  0.00s  (84,874 n/s)
+  D3: PASS  got=         495  expected=         495  time=  0.01s  (92,985 n/s)
+  D4: PASS  got=       8,349  expected=       8,349  time=  0.08s  (110,008 n/s)
+
+Line 65: 8/8/8/8/8/K7/P7/k7 w - - 0 1
+  D1: PASS  got=           3  expected=           3  time=  0.00s  (44,117 n/s)
+  D2: PASS  got=           7  expected=           7  time=  0.00s  (33,748 n/s)
+  D3: PASS  got=          43  expected=          43  time=  0.00s  (48,849 n/s)
+  D4: PASS  got=         199  expected=         199  time=  0.00s  (47,273 n/s)
+
+Line 66: 8/8/8/8/8/7K/7P/7k w - - 0 1
+  D1: PASS  got=           3  expected=           3  time=  0.00s  (3,556 n/s)
+  D2: PASS  got=           7  expected=           7  time=  0.00s  (31,221 n/s)
+  D3: PASS  got=          43  expected=          43  time=  0.00s  (37,245 n/s)
+  D4: PASS  got=         199  expected=         199  time=  0.00s  (45,663 n/s)
+
+Line 67: K7/p7/k7/8/8/8/8/8 w - - 0 1
+  D1: PASS  got=           1  expected=           1  time=  0.00s  (22,620 n/s)
+  D2: PASS  got=           3  expected=           3  time=  0.00s  (28,938 n/s)
+  D3: PASS  got=          12  expected=          12  time=  0.00s  (38,803 n/s)
+  D4: PASS  got=          80  expected=          80  time=  0.00s  (54,503 n/s)
+
+Line 68: 7K/7p/7k/8/8/8/8/8 w - - 0 1
+  D1: PASS  got=           1  expected=           1  time=  0.00s  (21,314 n/s)
+  D2: PASS  got=           3  expected=           3  time=  0.00s  (28,379 n/s)
+  D3: PASS  got=          12  expected=          12  time=  0.00s  (39,344 n/s)
+  D4: PASS  got=          80  expected=          80  time=  0.00s  (41,535 n/s)
+
+Line 69: 8/2k1p3/3pP3/3P2K1/8/8/8/8 w - - 0 1
+  D1: PASS  got=           7  expected=           7  time=  0.00s  (53,417 n/s)
+  D2: PASS  got=          35  expected=          35  time=  0.00s  (46,189 n/s)
+  D3: PASS  got=         210  expected=         210  time=  0.00s  (50,500 n/s)
+  D4: PASS  got=       1,091  expected=       1,091  time=  0.02s  (45,818 n/s)
+
+Line 70: 8/8/8/8/8/K7/P7/k7 b - - 0 1
+  D1: PASS  got=           1  expected=           1  time=  0.00s  (21,390 n/s)
+  D2: PASS  got=           3  expected=           3  time=  0.00s  (34,188 n/s)
+  D3: PASS  got=          12  expected=          12  time=  0.00s  (53,761 n/s)
+  D4: PASS  got=          80  expected=          80  time=  0.00s  (51,305 n/s)
+
+Line 71: 8/8/8/8/8/7K/7P/7k b - - 0 1
+  D1: PASS  got=           1  expected=           1  time=  0.00s  (22,263 n/s)
+  D2: PASS  got=           3  expected=           3  time=  0.00s  (28,616 n/s)
+  D3: PASS  got=          12  expected=          12  time=  0.00s  (38,059 n/s)
+  D4: PASS  got=          80  expected=          80  time=  0.00s  (50,650 n/s)
+
+Line 72: K7/p7/k7/8/8/8/8/8 b - - 0 1
+  D1: PASS  got=           3  expected=           3  time=  0.00s  (42,883 n/s)
+  D2: PASS  got=           7  expected=           7  time=  0.00s  (34,696 n/s)
+  D3: PASS  got=          43  expected=          43  time=  0.00s  (49,941 n/s)
+  D4: PASS  got=         199  expected=         199  time=  0.01s  (37,351 n/s)
+
+Line 73: 7K/7p/7k/8/8/8/8/8 b - - 0 1
+  D1: PASS  got=           3  expected=           3  time=  0.00s  (44,499 n/s)
+  D2: PASS  got=           7  expected=           7  time=  0.00s  (30,129 n/s)
+  D3: PASS  got=          43  expected=          43  time=  0.00s  (50,747 n/s)
+  D4: PASS  got=         199  expected=         199  time=  0.00s  (49,689 n/s)
+
+Line 74: 8/2k1p3/3pP3/3P2K1/8/8/8/8 b - - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (54,819 n/s)
+  D2: PASS  got=          35  expected=          35  time=  0.00s  (56,145 n/s)
+  D3: PASS  got=         182  expected=         182  time=  0.00s  (46,108 n/s)
+  D4: PASS  got=       1,091  expected=       1,091  time=  0.02s  (48,631 n/s)
+
+Line 75: 8/8/8/8/8/4k3/4P3/4K3 w - - 0 1
+  D1: PASS  got=           2  expected=           2  time=  0.00s  (32,854 n/s)
+  D2: PASS  got=           8  expected=           8  time=  0.00s  (30,863 n/s)
+  D3: PASS  got=          44  expected=          44  time=  0.00s  (28,087 n/s)
+  D4: PASS  got=         282  expected=         282  time=  0.01s  (39,695 n/s)
+
+Line 76: 4k3/4p3/4K3/8/8/8/8/8 b - - 0 1
+  D1: PASS  got=           2  expected=           2  time=  0.00s  (31,662 n/s)
+  D2: PASS  got=           8  expected=           8  time=  0.00s  (18,145 n/s)
+  D3: PASS  got=          44  expected=          44  time=  0.00s  (36,381 n/s)
+  D4: PASS  got=         282  expected=         282  time=  0.01s  (35,368 n/s)
+
+Line 77: 8/8/7k/7p/7P/7K/8/8 w - - 0 1
+  D1: PASS  got=           3  expected=           3  time=  0.00s  (42,452 n/s)
+  D2: PASS  got=           9  expected=           9  time=  0.00s  (43,330 n/s)
+  D3: PASS  got=          57  expected=          57  time=  0.00s  (29,831 n/s)
+  D4: PASS  got=         360  expected=         360  time=  0.01s  (38,540 n/s)
+
+Line 78: 8/8/k7/p7/P7/K7/8/8 w - - 0 1
+  D1: PASS  got=           3  expected=           3  time=  0.00s  (41,498 n/s)
+  D2: PASS  got=           9  expected=           9  time=  0.00s  (32,707 n/s)
+  D3: PASS  got=          57  expected=          57  time=  0.00s  (48,455 n/s)
+  D4: PASS  got=         360  expected=         360  time=  0.01s  (51,989 n/s)
+
+Line 79: 8/8/3k4/3p4/3P4/3K4/8/8 w - - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (52,264 n/s)
+  D2: PASS  got=          25  expected=          25  time=  0.00s  (39,357 n/s)
+  D3: PASS  got=         180  expected=         180  time=  0.00s  (52,802 n/s)
+  D4: PASS  got=       1,294  expected=       1,294  time=  0.02s  (54,946 n/s)
+
+Line 80: 8/3k4/3p4/8/3P4/3K4/8/8 w - - 0 1
+  D1: PASS  got=           8  expected=           8  time=  0.00s  (97,067 n/s)
+  D2: PASS  got=          61  expected=          61  time=  0.00s  (88,363 n/s)
+  D3: PASS  got=         483  expected=         483  time=  0.01s  (59,947 n/s)
+  D4: PASS  got=       3,213  expected=       3,213  time=  0.06s  (54,402 n/s)
+
+Line 81: 8/8/3k4/3p4/8/3P4/3K4/8 w - - 0 1
+  D1: PASS  got=           8  expected=           8  time=  0.00s  (73,988 n/s)
+  D2: PASS  got=          61  expected=          61  time=  0.00s  (66,621 n/s)
+  D3: PASS  got=         411  expected=         411  time=  0.01s  (59,288 n/s)
+  D4: PASS  got=       3,213  expected=       3,213  time=  0.06s  (56,626 n/s)
+
+Line 82: k7/8/3p4/8/3P4/8/8/7K w - - 0 1
+  D1: PASS  got=           4  expected=           4  time=  0.00s  (65,530 n/s)
+  D2: PASS  got=          15  expected=          15  time=  0.00s  (18,462 n/s)
+  D3: PASS  got=          90  expected=          90  time=  0.00s  (44,253 n/s)
+  D4: PASS  got=         534  expected=         534  time=  0.01s  (52,989 n/s)
+
+Line 83: 8/8/7k/7p/7P/7K/8/8 b - - 0 1
+  D1: PASS  got=           3  expected=           3  time=  0.00s  (47,524 n/s)
+  D2: PASS  got=           9  expected=           9  time=  0.00s  (31,327 n/s)
+  D3: PASS  got=          57  expected=          57  time=  0.00s  (54,578 n/s)
+  D4: PASS  got=         360  expected=         360  time=  0.01s  (46,658 n/s)
+
+Line 84: 8/8/k7/p7/P7/K7/8/8 b - - 0 1
+  D1: PASS  got=           3  expected=           3  time=  0.00s  (48,063 n/s)
+  D2: PASS  got=           9  expected=           9  time=  0.00s  (36,916 n/s)
+  D3: PASS  got=          57  expected=          57  time=  0.00s  (49,970 n/s)
+  D4: PASS  got=         360  expected=         360  time=  0.01s  (54,479 n/s)
+
+Line 85: 8/8/3k4/3p4/3P4/3K4/8/8 b - - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (46,403 n/s)
+  D2: PASS  got=          25  expected=          25  time=  0.00s  (43,703 n/s)
+  D3: PASS  got=         180  expected=         180  time=  0.00s  (51,062 n/s)
+  D4: PASS  got=       1,294  expected=       1,294  time=  0.03s  (44,769 n/s)
+
+Line 86: 8/3k4/3p4/8/3P4/3K4/8/8 b - - 0 1
+  D1: PASS  got=           8  expected=           8  time=  0.00s  (57,640 n/s)
+  D2: PASS  got=          61  expected=          61  time=  0.00s  (53,018 n/s)
+  D3: PASS  got=         411  expected=         411  time=  0.01s  (44,561 n/s)
+  D4: PASS  got=       3,213  expected=       3,213  time=  0.06s  (58,260 n/s)
+
+Line 87: 8/8/3k4/3p4/8/3P4/3K4/8 b - - 0 1
+  D1: PASS  got=           8  expected=           8  time=  0.00s  (70,979 n/s)
+  D2: PASS  got=          61  expected=          61  time=  0.00s  (66,572 n/s)
+  D3: PASS  got=         483  expected=         483  time=  0.01s  (57,238 n/s)
+  D4: PASS  got=       3,213  expected=       3,213  time=  0.06s  (57,822 n/s)
+
+Line 88: k7/8/3p4/8/3P4/8/8/7K b - - 0 1
+  D1: PASS  got=           4  expected=           4  time=  0.00s  (59,479 n/s)
+  D2: PASS  got=          15  expected=          15  time=  0.00s  (53,989 n/s)
+  D3: PASS  got=          89  expected=          89  time=  0.00s  (52,200 n/s)
+  D4: PASS  got=         537  expected=         537  time=  0.01s  (59,262 n/s)
+
+Line 89: 7k/3p4/8/8/3P4/8/8/K7 w - - 0 1
+  D1: PASS  got=           4  expected=           4  time=  0.00s  (66,389 n/s)
+  D2: PASS  got=          19  expected=          19  time=  0.00s  (24,207 n/s)
+  D3: PASS  got=         117  expected=         117  time=  0.00s  (60,125 n/s)
+  D4: PASS  got=         720  expected=         720  time=  0.01s  (57,132 n/s)
+
+Line 90: 7k/8/8/3p4/8/8/3P4/K7 w - - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (70,880 n/s)
+  D2: PASS  got=          19  expected=          19  time=  0.00s  (50,225 n/s)
+  D3: PASS  got=         116  expected=         116  time=  0.00s  (60,184 n/s)
+  D4: PASS  got=         716  expected=         716  time=  0.01s  (61,800 n/s)
+
+Line 91: k7/8/8/7p/6P1/8/8/K7 w - - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (72,288 n/s)
+  D2: PASS  got=          22  expected=          22  time=  0.00s  (64,721 n/s)
+  D3: PASS  got=         139  expected=         139  time=  0.00s  (40,789 n/s)
+  D4: PASS  got=         877  expected=         877  time=  0.01s  (63,044 n/s)
+
+Line 92: k7/8/7p/8/8/6P1/8/K7 w - - 0 1
+  D1: PASS  got=           4  expected=           4  time=  0.00s  (61,776 n/s)
+  D2: PASS  got=          16  expected=          16  time=  0.00s  (54,352 n/s)
+  D3: PASS  got=         101  expected=         101  time=  0.00s  (59,333 n/s)
+  D4: PASS  got=         637  expected=         637  time=  0.01s  (63,364 n/s)
+
+Line 93: k7/8/8/6p1/7P/8/8/K7 w - - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (79,051 n/s)
+  D2: PASS  got=          22  expected=          22  time=  0.00s  (59,359 n/s)
+  D3: PASS  got=         139  expected=         139  time=  0.00s  (57,973 n/s)
+  D4: PASS  got=         877  expected=         877  time=  0.02s  (57,843 n/s)
+
+Line 94: k7/8/6p1/8/8/7P/8/K7 w - - 0 1
+  D1: PASS  got=           4  expected=           4  time=  0.00s  (59,040 n/s)
+  D2: PASS  got=          16  expected=          16  time=  0.00s  (34,221 n/s)
+  D3: PASS  got=         101  expected=         101  time=  0.00s  (43,040 n/s)
+  D4: PASS  got=         637  expected=         637  time=  0.01s  (50,868 n/s)
+
+Line 95: k7/8/8/3p4/4p3/8/8/7K w - - 0 1
+  D1: PASS  got=           3  expected=           3  time=  0.00s  (30,315 n/s)
+  D2: PASS  got=          15  expected=          15  time=  0.00s  (59,592 n/s)
+  D3: PASS  got=          84  expected=          84  time=  0.00s  (46,001 n/s)
+  D4: PASS  got=         573  expected=         573  time=  0.01s  (52,288 n/s)
+
+Line 96: k7/8/3p4/8/8/4P3/8/7K w - - 0 1
+  D1: PASS  got=           4  expected=           4  time=  0.00s  (54,856 n/s)
+  D2: PASS  got=          16  expected=          16  time=  0.00s  (54,912 n/s)
+  D3: PASS  got=         101  expected=         101  time=  0.00s  (45,453 n/s)
+  D4: PASS  got=         637  expected=         637  time=  0.01s  (52,073 n/s)
+
+Line 97: 7k/3p4/8/8/3P4/8/8/K7 b - - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (71,301 n/s)
+  D2: PASS  got=          19  expected=          19  time=  0.00s  (52,777 n/s)
+  D3: PASS  got=         117  expected=         117  time=  0.00s  (63,152 n/s)
+  D4: PASS  got=         720  expected=         720  time=  0.01s  (58,088 n/s)
+
+Line 98: 7k/8/8/3p4/8/8/3P4/K7 b - - 0 1
+  D1: PASS  got=           4  expected=           4  time=  0.00s  (58,932 n/s)
+  D2: PASS  got=          19  expected=          19  time=  0.00s  (61,680 n/s)
+  D3: PASS  got=         117  expected=         117  time=  0.00s  (60,461 n/s)
+  D4: PASS  got=         712  expected=         712  time=  0.01s  (57,986 n/s)
+
+Line 99: k7/8/8/7p/6P1/8/8/K7 b - - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (67,911 n/s)
+  D2: PASS  got=          22  expected=          22  time=  0.00s  (60,356 n/s)
+  D3: PASS  got=         139  expected=         139  time=  0.00s  (58,280 n/s)
+  D4: PASS  got=         877  expected=         877  time=  0.01s  (62,466 n/s)
+
+Line 100: k7/8/7p/8/8/6P1/8/K7 b - - 0 1
+  D1: PASS  got=           4  expected=           4  time=  0.00s  (62,216 n/s)
+  D2: PASS  got=          16  expected=          16  time=  0.00s  (55,267 n/s)
+  D3: PASS  got=         101  expected=         101  time=  0.00s  (53,135 n/s)
+  D4: PASS  got=         637  expected=         637  time=  0.01s  (66,400 n/s)
+
+Line 101: k7/8/8/6p1/7P/8/8/K7 b - - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (79,522 n/s)
+  D2: PASS  got=          22  expected=          22  time=  0.00s  (75,224 n/s)
+  D3: PASS  got=         139  expected=         139  time=  0.00s  (77,980 n/s)
+  D4: PASS  got=         877  expected=         877  time=  0.33s  (2,698 n/s)
+
+Line 102: k7/8/6p1/8/8/7P/8/K7 b - - 0 1
+  D1: PASS  got=           4  expected=           4  time=  0.00s  (66,025 n/s)
+  D2: PASS  got=          16  expected=          16  time=  0.00s  (57,117 n/s)
+  D3: PASS  got=         101  expected=         101  time=  0.00s  (62,025 n/s)
+  D4: PASS  got=         637  expected=         637  time=  0.01s  (55,571 n/s)
+
+Line 103: k7/8/8/3p4/4p3/8/8/7K b - - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (79,417 n/s)
+  D2: PASS  got=          15  expected=          15  time=  0.00s  (47,268 n/s)
+  D3: PASS  got=         102  expected=         102  time=  0.00s  (60,700 n/s)
+  D4: PASS  got=         569  expected=         569  time=  0.01s  (51,871 n/s)
+
+Line 104: k7/8/3p4/8/8/4P3/8/7K b - - 0 1
+  D1: PASS  got=           4  expected=           4  time=  0.00s  (50,473 n/s)
+  D2: PASS  got=          16  expected=          16  time=  0.00s  (51,703 n/s)
+  D3: PASS  got=         101  expected=         101  time=  0.00s  (58,678 n/s)
+  D4: PASS  got=         637  expected=         637  time=  0.01s  (59,133 n/s)
+
+Line 105: 7k/8/8/p7/1P6/8/8/7K w - - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (39,906 n/s)
+  D2: PASS  got=          22  expected=          22  time=  0.00s  (53,915 n/s)
+  D3: PASS  got=         139  expected=         139  time=  0.00s  (61,817 n/s)
+  D4: PASS  got=         877  expected=         877  time=  0.02s  (52,363 n/s)
+
+Line 106: 7k/8/p7/8/8/1P6/8/7K w - - 0 1
+  D1: PASS  got=           4  expected=           4  time=  0.00s  (41,884 n/s)
+  D2: PASS  got=          16  expected=          16  time=  0.00s  (45,118 n/s)
+  D3: PASS  got=         101  expected=         101  time=  0.00s  (65,277 n/s)
+  D4: PASS  got=         637  expected=         637  time=  0.01s  (48,129 n/s)
+
+Line 107: 7k/8/8/1p6/P7/8/8/7K w - - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (59,318 n/s)
+  D2: PASS  got=          22  expected=          22  time=  0.00s  (58,471 n/s)
+  D3: PASS  got=         139  expected=         139  time=  0.00s  (54,409 n/s)
+  D4: PASS  got=         877  expected=         877  time=  0.02s  (50,772 n/s)
+
+Line 108: 7k/8/1p6/8/8/P7/8/7K w - - 0 1
+  D1: PASS  got=           4  expected=           4  time=  0.00s  (61,420 n/s)
+  D2: PASS  got=          16  expected=          16  time=  0.00s  (54,974 n/s)
+  D3: PASS  got=         101  expected=         101  time=  0.00s  (61,275 n/s)
+  D4: PASS  got=         637  expected=         637  time=  0.01s  (57,888 n/s)
+
+Line 109: k7/7p/8/8/8/8/6P1/K7 w - - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (74,860 n/s)
+  D2: PASS  got=          25  expected=          25  time=  0.00s  (62,545 n/s)
+  D3: PASS  got=         161  expected=         161  time=  0.00s  (66,605 n/s)
+  D4: PASS  got=       1,035  expected=       1,035  time=  0.02s  (65,326 n/s)
+
+Line 110: k7/6p1/8/8/8/8/7P/K7 w - - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (69,767 n/s)
+  D2: PASS  got=          25  expected=          25  time=  0.00s  (68,259 n/s)
+  D3: PASS  got=         161  expected=         161  time=  0.00s  (93,568 n/s)
+  D4: PASS  got=       1,035  expected=       1,035  time=  0.02s  (63,040 n/s)
+
+Line 111: 3k4/3pp3/8/8/8/8/3PP3/3K4 w - - 0 1
+  D1: PASS  got=           7  expected=           7  time=  0.00s  (91,954 n/s)
+  D2: PASS  got=          49  expected=          49  time=  0.00s  (86,362 n/s)
+  D3: PASS  got=         378  expected=         378  time=  0.00s  (76,449 n/s)
+  D4: PASS  got=       2,902  expected=       2,902  time=  0.05s  (61,625 n/s)
+
+Line 112: 7k/8/8/p7/1P6/8/8/7K b - - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (67,077 n/s)
+  D2: PASS  got=          22  expected=          22  time=  0.00s  (19,171 n/s)
+  D3: PASS  got=         139  expected=         139  time=  0.00s  (55,187 n/s)
+  D4: PASS  got=         877  expected=         877  time=  0.02s  (57,043 n/s)
+
+Line 113: 7k/8/p7/8/8/1P6/8/7K b - - 0 1
+  D1: PASS  got=           4  expected=           4  time=  0.00s  (64,996 n/s)
+  D2: PASS  got=          16  expected=          16  time=  0.00s  (54,646 n/s)
+  D3: PASS  got=         101  expected=         101  time=  0.00s  (57,536 n/s)
+  D4: PASS  got=         637  expected=         637  time=  0.01s  (62,030 n/s)
+
+Line 114: 7k/8/8/1p6/P7/8/8/7K b - - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (69,726 n/s)
+  D2: PASS  got=          22  expected=          22  time=  0.00s  (32,343 n/s)
+  D3: PASS  got=         139  expected=         139  time=  0.00s  (46,582 n/s)
+  D4: PASS  got=         877  expected=         877  time=  0.02s  (48,952 n/s)
+
+Line 115: 7k/8/1p6/8/8/P7/8/7K b - - 0 1
+  D1: PASS  got=           4  expected=           4  time=  0.00s  (59,813 n/s)
+  D2: PASS  got=          16  expected=          16  time=  0.00s  (46,415 n/s)
+  D3: PASS  got=         101  expected=         101  time=  0.00s  (52,062 n/s)
+  D4: PASS  got=         637  expected=         637  time=  0.01s  (53,238 n/s)
+
+Line 116: k7/7p/8/8/8/8/6P1/K7 b - - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (73,800 n/s)
+  D2: PASS  got=          25  expected=          25  time=  0.00s  (58,587 n/s)
+  D3: PASS  got=         161  expected=         161  time=  0.00s  (59,388 n/s)
+  D4: PASS  got=       1,035  expected=       1,035  time=  0.02s  (59,213 n/s)
+
+Line 117: k7/6p1/8/8/8/8/7P/K7 b - - 0 1
+  D1: PASS  got=           5  expected=           5  time=  0.00s  (74,165 n/s)
+  D2: PASS  got=          25  expected=          25  time=  0.00s  (61,374 n/s)
+  D3: PASS  got=         161  expected=         161  time=  0.00s  (46,068 n/s)
+  D4: PASS  got=       1,035  expected=       1,035  time=  0.02s  (49,562 n/s)
+
+Line 118: 3k4/3pp3/8/8/8/8/3PP3/3K4 b - - 0 1
+  D1: PASS  got=           7  expected=           7  time=  0.00s  (88,004 n/s)
+  D2: PASS  got=          49  expected=          49  time=  0.00s  (68,848 n/s)
+  D3: PASS  got=         378  expected=         378  time=  0.01s  (69,324 n/s)
+  D4: PASS  got=       2,902  expected=       2,902  time=  0.04s  (67,817 n/s)
+
+Line 119: 8/Pk6/8/8/8/8/6Kp/8 w - - 0 1
+  D1: PASS  got=          11  expected=          11  time=  0.00s  (85,409 n/s)
+  D2: PASS  got=          97  expected=          97  time=  0.00s  (64,044 n/s)
+  D3: PASS  got=         887  expected=         887  time=  0.01s  (60,994 n/s)
+  D4: PASS  got=       8,048  expected=       8,048  time=  0.12s  (65,964 n/s)
+
+Line 120: n1n5/1Pk5/8/8/8/8/5Kp1/5N1N w - - 0 1
+  D1: PASS  got=          24  expected=          24  time=  0.00s  (134,297 n/s)
+  D2: PASS  got=         421  expected=         421  time=  0.00s  (100,980 n/s)
+  D3: PASS  got=       7,421  expected=       7,421  time=  0.08s  (93,946 n/s)
+  D4: PASS  got=     124,608  expected=     124,608  time=  1.29s  (96,896 n/s)
+
+Line 121: 8/PPPk4/8/8/8/8/4Kppp/8 w - - 0 1
+  D1: PASS  got=          18  expected=          18  time=  0.00s  (116,914 n/s)
+  D2: PASS  got=         270  expected=         270  time=  0.00s  (100,301 n/s)
+  D3: PASS  got=       4,699  expected=       4,699  time=  0.05s  (94,939 n/s)
+  D4: PASS  got=      79,355  expected=      79,355  time=  0.85s  (93,538 n/s)
+
+Line 122: n1n5/PPPk4/8/8/8/8/4Kppp/5N1N w - - 0 1
+  D1: PASS  got=          24  expected=          24  time=  0.00s  (132,994 n/s)
+  D2: PASS  got=         496  expected=         496  time=  0.00s  (121,839 n/s)
+  D3: PASS  got=       9,483  expected=       9,483  time=  0.09s  (100,687 n/s)
+  D4: PASS  got=     182,838  expected=     182,838  time=  1.77s  (103,431 n/s)
+
+Line 123: 8/Pk6/8/8/8/8/6Kp/8 b - - 0 1
+  D1: PASS  got=          11  expected=          11  time=  0.00s  (71,024 n/s)
+  D2: PASS  got=          97  expected=          97  time=  0.00s  (66,837 n/s)
+  D3: PASS  got=         887  expected=         887  time=  0.01s  (70,905 n/s)
+  D4: PASS  got=       8,048  expected=       8,048  time=  0.11s  (71,810 n/s)
+
+Line 124: n1n5/1Pk5/8/8/8/8/5Kp1/5N1N b - - 0 1
+  D1: PASS  got=          24  expected=          24  time=  0.00s  (69,064 n/s)
+  D2: PASS  got=         421  expected=         421  time=  0.00s  (103,231 n/s)
+  D3: PASS  got=       7,421  expected=       7,421  time=  0.08s  (93,057 n/s)
+  D4: PASS  got=     124,608  expected=     124,608  time=  1.26s  (98,936 n/s)
+
+Line 125: 8/PPPk4/8/8/8/8/4Kppp/8 b - - 0 1
+  D1: PASS  got=          18  expected=          18  time=  0.00s  (98,204 n/s)
+  D2: PASS  got=         270  expected=         270  time=  0.00s  (93,152 n/s)
+  D3: PASS  got=       4,699  expected=       4,699  time=  0.05s  (101,535 n/s)
+  D4: PASS  got=      79,355  expected=      79,355  time=  0.82s  (96,375 n/s)
+
+Line 126: n1n5/PPPk4/8/8/8/8/4Kppp/5N1N b - - 0 1
+  D1: PASS  got=          24  expected=          24  time=  0.00s  (133,271 n/s)
+  D2: PASS  got=         496  expected=         496  time=  0.00s  (102,384 n/s)
+  D3: PASS  got=       9,483  expected=       9,483  time=  0.09s  (105,542 n/s)
+  D4: PASS  got=     182,838  expected=     182,838  time=  1.76s  (104,029 n/s)
+
+Line 127: 8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1
+  D4: FAIL  got=      43,263  expected=      43,238  time=  0.43s  (100,084 n/s)
+         *** difference: +25 ***
+
+Line 128: rnbqkb1r/ppppp1pp/7n/4Pp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3
+
+============================================================
+Results: 504/505 tests passed.
+1 test(s) FAILED.
