@@ -1,13 +1,13 @@
 """
    By Paul Robert Andreini
-    14 Apr 2026
+    03 May 2026
 
    Code here is LOOSELY based on a YouTube tutorial series, whose playlist is visible at the following link:
         https://www.youtube.com/playlist?list=PLBwF487qi8MGU81nDGaeNE1EnNEPYWKY_
    Although, now, we will be going beyond this tutorial (still leaving the link here for posterity).
     We will now implement a much faster AND more-accurate algorithm --- on the "Stockfish" engine, (state-of-the-art).
 
-   This code is for EPISODE 22.
+   This code is for EPISODE 23.
 
    MAIN DRIVER FILE is responsible for:
     (a) handling user input;
@@ -297,7 +297,7 @@ def main():
     ## Defining boolean variables to handle AI.
     ##  LATER: Define DIFFICULTY-LEVELS with, say, an integer value from 0 to 10.
     human_player_white = True
-    human_player_black = True
+    human_player_black = False
 
     running = True
 

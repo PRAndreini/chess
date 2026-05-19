@@ -1,13 +1,13 @@
 """
    By Paul Robert Andreini
-    14 Apr 2026
+    03 May 2026
 
    Code here is LOOSELY based on a YouTube tutorial series, whose playlist is visible at the following link:
         https://www.youtube.com/playlist?list=PLBwF487qi8MGU81nDGaeNE1EnNEPYWKY_
    Although, now, we will be going beyond this tutorial (still leaving the link here for posterity).
     We will now implement a much faster AND more-accurate algorithm --- on the "Stockfish" engine, (state-of-the-art).
 
-   This code is for EPISODE 22.
+   This code is for EPISODE 23.
 
    ###########################################################################
 
@@ -37,6 +37,25 @@ PIECE_SCORES = {
     "Q": 900,
     "K": 0
 }
+
+## Piece-scores for SEE (Static Exchange Evaluation).
+## The King is a very-high value; "capturing" a "protected" King is always seen as "winning" in the AI's eyes;
+##  this avoids edge-cases where the King is seen as an attacker in the exchange.
+SEE_SCORES = {
+    "P": 100,
+    "N": 320,
+    "B": 330,
+    "R": 500,
+    "Q": 900,
+    "K": 20000
+}
+
+## Legal-moves depending on which type of piece (almost-copied from ChessEngine.GameState.__init__(...)).
+##  Pawns are different: depending on color (w/b) pawns either increase/decrease row number respectively.
+KNIGHT_DIRS = [(-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1)]  ## 8 L-SHAPE dirs.
+DIAG_DIRS = [(-1, -1), (-1, 1), (1, -1), (1, 1)]  ## All 4 DIAGONAL dirs.
+ORTH_DIRS = [(-1, 0), (0, -1), (1, 0), (0, 1)]  ## All 4 ORTHOGONAL dirs.
+KING_DIRS = [(-1, 0), (0, -1), (1, 0), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]  ## All 8 RADIAL dirs.
 
 CHECKMATE = 50000  ## A move that checkmates the opponent is the best-possible move, so set this value very high.
 STALEMATE = 0  ## Stalemate is better than losing (= -CHECKMATE), but a draw is equally good for both players.
@@ -393,6 +412,177 @@ class MoveOrderer:
 
 ##### Defining MOVE-SCORING FUNCTIONS #####
 
+def _find_least_valuable_attacker(b, r, c, white_to_move: bool, removed):
+    """
+       Determines the least-valuable piece (of a given color) that can attack the target square, (r, c),
+        provided they have not already been exchanged on this square (these will be in the set "removed").
+       Handles X-RAY ATTACKS: if a removed piece was blocking a bishop, rook, or queen,
+        that piece now "sees through" the vacated square and becomes an attacker.
+
+       PARAMETERS:
+        b (list[list[str]]): a 2D-list, each entry is 2 chars each, denoting either a piece or a blank space;
+        r (int): row number;
+        c (int): column number;
+        white_to_move (bool): whether it is white's turn to move;
+        removed (set[tuple]): set of (r, c) tuples representing pieces already removed in the exchange.
+
+       RETURN:
+        (piece_type, r, c) (tuple) of the least-valuable attacker; None if no attacker exists.
+    """
+    color = "w" if white_to_move else "b"
+    best = None  ## Will eventually hold tuple (value, piece_type, r, c); will return the lowest-value.
+
+    ##### PAWN ATTACKS #####
+
+    ## wP (bP) attacks UPWARD (DOWNWARD), so a wP (bP) at square (r, c) attacks one row ABOVE (BELOW).
+    ##  All pawns can attack the col either to the left (decrease) or right (increase).
+    test_r = (r+1) if white_to_move else (r-1)
+    for dc in (-1, 1):
+        test_c = c + dc
+        if (0 <= test_r < 8) and (0 <= test_c < 8) and ((test_r, test_c) not in removed):
+            if b[test_r][test_c] == color + "P":
+                return "P", test_r, test_c  ## Pawn is the least-valuable; return it immediately, if found.
+
+    ##### KNIGHT ATTACKS #####
+
+    for dr, dc in KNIGHT_DIRS:  ## List of 2D tuples.
+        test_r, test_c = r + dr, c + dc
+        if ((0 <= test_r < 8) and (0 <= test_c < 8)) and ((test_r, test_c) not in removed):
+            if b[test_r][test_c] == color + "N":
+                see_score = SEE_SCORES["N"]
+                if (best is None) or (see_score < best[0]):
+                    best = (see_score, "N", test_r, test_c)
+
+    ##### ORTHOGONAL ATTACKS #####
+
+    ##  Either a Rook or an orthogonal-Queen.
+    for dr, dc in ORTH_DIRS:
+        test_r, test_c = r + dr, c + dc
+        while (0 <= test_r < 8) and (0 <= test_c < 8):
+            if (test_r, test_c) in removed:
+                test_r += dr
+                test_c += dc
+                continue
+            piece = b[test_r][test_c]
+            if piece == "--":
+                test_r += dr
+                test_c += dc
+                continue
+            if (piece[0] == color) and (piece[1] in ["R", "Q"]):
+                see_score = SEE_SCORES[piece[1]]
+                if (best is None) or (see_score < best[0]):
+                    best = (see_score, piece[1], test_r, test_c)
+            break
+
+    ##### DIAGONAL ATTACKS #####
+
+    ## Either a Bishop or a diagonal-Queen.
+    for dr, dc in DIAG_DIRS:
+        test_r, test_c = r + dr, c + dc
+        while (0 <= test_r < 8) and (0 <= test_c < 8):
+            if (test_r, test_c) in removed:
+                test_r += dr
+                test_c += dc
+                continue
+            piece = b[test_r][test_c]
+            if piece == "--":
+                test_r += dr
+                test_c += dc
+                continue
+            if (piece[0] == color) and (piece[1] in ["B", "Q"]):
+                see_score = SEE_SCORES[piece[1]]
+                if (best is None) or (see_score < best[0]):
+                    best = (see_score, piece[1], test_r, test_c)
+            break
+
+    ##### KING ATTACKS #####
+
+    ## A King can move in any of the eight nearest-neighbor directions, but ONLY ONE SQUARE at a time.
+    for dr, dc in KING_DIRS:
+        test_r, test_c = r + dr, c + dc
+        if ((0 <= test_r < 8) and (0 <= test_c < 8)) and ((test_r, test_c) not in removed):
+            if b[test_r][test_c] == color + "K":
+                see_score = SEE_SCORES["K"]
+                if (best is None) or (see_score < best[0]):
+                    best = (see_score, "K", test_r, test_c)
+
+    ##### RETURN STATEMENT #####
+
+    if best is None:
+        return None
+    return best[1], best[2], best[3]
+
+
+def see(b, m) -> int:
+    """
+       Static Exchange Evaluation: simulates a series of captures on a single square, with each side using its LVA.
+        Returns the net material gain (loss) from the side making the initial capture.
+
+       PARAMETERS:
+        b (list[list[str]]): chessboard: a 2D-list, each entry is 2 chars each, denoting either a piece or empty;
+        m (Move): a Move object representing the initial capture.
+
+       RETURNS:
+        gain (int): positive means winning material; negative means losing material.
+    """
+    if m.piece_captured == "-":
+        return 0
+
+    ## gain[d] holds the SPECULATIVE material gain at depth d.
+    gain = [0] * 32  ## The game starts with 32 pieces on the board; this is the maximum number of static exchanges.
+    d = 0
+
+    ## The initial capture wins the value of the captured piece (e.g., wB takes bR --> +500 centipawns).
+    gain[0] = SEE_SCORES.get(m.piece_captured[1], 0)
+
+    ## The piece with which we captured is now exposed to potential capture (e.g. bP takes wB --> +170 centipawns).
+    current_attacker_value = SEE_SCORES[m.piece_moved[1]]
+
+    """
+       The piece with which we just captured the enemy has now vacated its starting square, so mark down the coords.
+        NOTE: this is a SET in Python3 notation, NOT a dict! The set contains exactly ONE (1) TUPLE.
+    
+       This will be useful for X-ray attacks. Going back to our example, if a Queen was behind the Bishop on that
+        diagonal, the Queen can now "see" all the way up to the Bishop (protecting it). Black would respond differently
+        if there IS a Queen behind the bishop compared to if there is NOT.
+    """
+    removed = {(m.start_r, m.start_c)}
+
+    ## After our capture, the other player gets to move. This keeps track of the turn based on which player just moved.
+    white_to_move = False if m.piece_moved[0] == "w" else True
+
+    target_r, target_c = m.end_r, m.end_c
+
+    while True:
+        d += 1
+
+        ## Speculatively capture: we win back what we lost, less what our opponent might win next.
+        gain[d] = current_attacker_value - gain[d-1]
+
+        ## PRUNING: if the best-case for both sides is negative (material LOSS), stop searching.
+        if max(-gain[d-1], gain[d]) < 0:
+            break
+
+        ## Find the NEXT-least valuable attacker on the current side (keep on going up in value from least-to-most).
+        new_lva = _find_least_valuable_attacker(
+            b=b, r=target_r, c=target_c, white_to_move=white_to_move, removed=removed
+                                                )
+        if new_lva is None:
+            break  ## No more extant attackers; the exchange is over.
+
+        piece_type, attacker_r, attacker_c = new_lva
+        removed.add((attacker_r, attacker_c))
+        current_attacker_value = SEE_SCORES[piece_type]
+        white_to_move = not white_to_move  ## Switch turns.
+
+    ## Minimax the gain array back to the root:
+    while d > 0:
+        d -= 1
+        gain[d] = -max(-gain[d], gain[d+1])
+
+    return gain[0]
+
+
 ## Preferred-method: if there is a "best" move, then this returns a max-score.
 def evaluate(gs: GameState) -> int:
     """
@@ -492,6 +682,13 @@ def quiescence(gs: GameState, alpha: int, beta: int) -> int:
 
     ## Search each capture/promotion RECURSIVELY.
     for m in capture_moves:
+
+        ## SEE (Static Exchange Evaluation) pruning: ignore captures that lose material.
+        ##  Run this for every move that isn't a capture or a pawn-promotion.
+        if (m.piece_captured[0] != "-") and (not m.is_pawn_promotion):
+            if see(b=gs.board, m=m) < 0:
+                continue
+
         gs.make_move(m)
         score = -quiescence(gs=gs, alpha=-beta, beta=-alpha)
         gs.undo_move()
@@ -578,8 +775,11 @@ def get_move_nega_max_with_alpha_beta_pruning(
 
         ## 2. Make, then score, finally undo that move.
         gs.make_move(m)
+        extension = 1 if gs.current_player_is_in_check else 0  ## Extend if in check...
         score = -get_move_nega_max_with_alpha_beta_pruning(
-            gs=gs, depth=depth-1, alpha=-beta, beta=-alpha, ply=ply+1, orderer=orderer, tt=tt, zobrist=zobrist
+            gs=gs, depth=depth-1+extension,
+            alpha=-beta, beta=-alpha, ply=ply+1,
+            orderer=orderer, tt=tt, zobrist=zobrist
         )
         gs.undo_move()
 
@@ -682,8 +882,10 @@ def helper_method_first_call(gs: GameState, vm_list: list) -> Move | None:
 
             ## 2. Make, then score, finally undo that move.
             gs.make_move(m)
+            extension = 1 if gs.current_player_is_in_check else 0  ## Extend if in check...
             score = -get_move_nega_max_with_alpha_beta_pruning(
-                gs=gs, depth=depth-1, alpha=-beta, beta=-alpha, ply=1,
+                gs=gs, depth=depth-1+extension,
+                alpha=-beta, beta=-alpha, ply=1,
                 orderer=_orderer, tt=_tt, zobrist=_zobrist
             )
             gs.undo_move()
