@@ -177,7 +177,7 @@ class Move:
         ## Handling for PAWN-MOVES:
         elif self.piece_moved[1] == "P":
 
-            ## Capture (excluding en-passant):
+            ## Capture (including en-passant):
             if self.piece_captured != "--":
                 pgn = f"{Move.cols_to_files[self.start_c]}x{self.get_rank_file(self.end_r, self.end_c)}"
 
