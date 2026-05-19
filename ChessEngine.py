@@ -912,11 +912,11 @@ class GameState:
             self.stalemate = False
 
         ## Searching for other possible causes of stalemate...
-        self.stalemate = self.search_for_material_stalemate()
-
-        ## Fixing a bug where one can move after stalemate:
-        if self.stalemate:
-            moves = []
+        # self.stalemate = self.search_for_material_stalemate()
+        #
+        # ## Fixing a bug where one can move after stalemate:
+        # if self.stalemate:
+        #     moves = []
 
         return moves
 
