@@ -1,13 +1,13 @@
 """
    By Paul Robert Andreini
-    03 May 2026
+    18 May 2026
 
    Code here is LOOSELY based on a YouTube tutorial series, whose playlist is visible at the following link:
         https://www.youtube.com/playlist?list=PLBwF487qi8MGU81nDGaeNE1EnNEPYWKY_
    Although, now, we will be going beyond this tutorial (still leaving the link here for posterity).
     We will now implement a much faster AND more-accurate algorithm --- on the "Stockfish" engine, (state-of-the-art).
 
-   This code is for EPISODE 23.
+   This code is for EPISODE 24.
 
    ###########################################################################
 
@@ -184,7 +184,7 @@ class Move:
         ## Handling for PAWN-MOVES:
         elif self.piece_moved[1] == "P":
 
-            ## Capture (excluding en-passant):
+            ## Capture (including en-passant):
             if self.piece_captured != "--":
                 pgn = f"{Move.cols_to_files[self.start_c]}x{self.get_rank_file(self.end_r, self.end_c)}"
 

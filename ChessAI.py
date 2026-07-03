@@ -1,13 +1,13 @@
 """
    By Paul Robert Andreini
-    03 May 2026
+    18 May 2026
 
    Code here is LOOSELY based on a YouTube tutorial series, whose playlist is visible at the following link:
         https://www.youtube.com/playlist?list=PLBwF487qi8MGU81nDGaeNE1EnNEPYWKY_
    Although, now, we will be going beyond this tutorial (still leaving the link here for posterity).
     We will now implement a much faster AND more-accurate algorithm --- on the "Stockfish" engine, (state-of-the-art).
 
-   This code is for EPISODE 23.
+   This code is for EPISODE 24.
 
    ###########################################################################
 
@@ -60,6 +60,7 @@ KING_DIRS = [(-1, 0), (0, -1), (1, 0), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1
 CHECKMATE = 50000  ## A move that checkmates the opponent is the best-possible move, so set this value very high.
 STALEMATE = 0  ## Stalemate is better than losing (= -CHECKMATE), but a draw is equally good for both players.
 MAX_DEPTH = 5  ## Iterative deepening will search from depth 1 up to this value.
+MAX_PLY = 64   ## Hard limit on search-depth to prevent runaway check-extensions.
 MAX_KILLER_TABLE_SIZE = 64  ## Must exceed the deepest ply reachable by search + quiescence.
 
 ####################
@@ -174,6 +175,63 @@ PST = {
     "Q": QUEEN_TABLE,
     "K": KING_TABLE,
 }
+
+##### ENDGAME CONSTANTS #####
+
+"""
+   PHASE SCORING: only counts minor and major PIECES, i.e., excluding P and K.
+    Starting position contains 14 pieces: 4 Knights; 4 Bishops; 4 Rooks; and 2 Queens.
+    The "phase score" for each piece is modulated by the values in the PHASE_WEIGHTS dict --> 24 phase points to start.
+    As pieces get captured, the position approaches a "pure endgame" (0 phase points).
+   This will help the AI transition smoothly from middlegame evaluation towards endgame evaluation.
+"""
+PHASE_WEIGHTS = {
+    "P": 0,  ## Pawns are excluded from phase-scoring.
+    "N": 1,
+    "B": 1,
+    "R": 2,
+    "Q": 4,
+    "K": 0   ## Kings are excluded from phase-scoring.
+}
+TOTAL_PHASE_SCORE = (4 * PHASE_WEIGHTS["N"]
+                     + 4 * PHASE_WEIGHTS["B"]
+                     + 4 * PHASE_WEIGHTS["R"]
+                     + 2 * PHASE_WEIGHTS["Q"])  ## 24.
+
+"""
+   ENDGAME KING TABLE: rewards centralization of the King during the endgame, where it is an active piece.
+    Need to define this separately, because KING_TABLE (opening/middlegame) rewards hiding your King behind pawns.
+"""
+ENDGAME_KING_TABLE = [
+    [-50, -40, -30, -20, -20, -30, -40, -50],
+    [-30, -20, -10,   0,   0, -10, -20, -30],
+    [-30, -10,  20,  30,  30,  20, -10, -30],
+    [-30, -10,  30,  40,  40,  30, -10, -30],
+    [-30, -10,  30,  40,  40,  30, -10, -30],
+    [-30, -10,  20,  30,  30,  20, -10, -30],
+    [-30, -30,   0,   0,   0,   0, -30, -30],
+    [-50, -30, -30, -30, -30, -30, -30, -50],
+]
+
+"""
+   PAWN-STRUCTURE PENALTIES/BONUSES:
+    (a) DOUBLED: two pawns same color same file (block each other without protecting each other);
+    (b) ISOLATED: a pawn with no friendly-pawns on adjacent files (a chronic weakness to exploit);
+    (c) PASSED: a pawn advanced beyond any enemy-pawns ahead of it on the same file OR adjacent files (can march to
+        promotion unimpeded by enemy pawns; bonus grows the closer it becomes to promotion).
+"""
+DOUBLED_PAWN_PENALTY = -15
+ISOLATED_PAWN_PENALTY = -20
+PASSED_PAWN_BONUS = [0, 5, 10, 20, 40, 60, 90, 0]  ## Indexed by rank-from-own-side. Pawns do not exist on ranks 0, 7.
+
+## BISHOP-PAIR allows two pieces to control all squares on the board, worth more than just the raw material score.
+BISHOP_PAIR_BONUS = 30
+
+## ROOKS PREFER OPEN FILES:
+##  An OPEN file is one with no pawns; a SEMI-OPEN file is one with no friendly pawns blocking the Rook.
+ROOK_OPEN_FILE_BONUS = 20
+ROOK_SEMI_OPEN_FILE_BONUS = 10
+
 
 ####################
 
@@ -565,8 +623,7 @@ def see(b, m) -> int:
 
         ## Find the NEXT-least valuable attacker on the current side (keep on going up in value from least-to-most).
         new_lva = _find_least_valuable_attacker(
-            b=b, r=target_r, c=target_c, white_to_move=white_to_move, removed=removed
-                                                )
+            b=b, r=target_r, c=target_c, white_to_move=white_to_move, removed=removed)
         if new_lva is None:
             break  ## No more extant attackers; the exchange is over.
 
@@ -582,6 +639,237 @@ def see(b, m) -> int:
 
     return gain[0]
 
+#######################################################################################################################
+
+##### ENHANCED EVALUATION (INTERNAL) FUNCTIONS #####
+
+def _compute_game_phase(b) -> float:
+    """
+       Returns a float between 0.0 (pure-endgame) and 1.0 (middlegame).
+        Calculates the current phase score, then normalizes this to the constant TOTAL_PHASE_SCORE=24.
+
+       PARAMETERS:
+        b (gs.board, list[list[str]]): the 8x8 chessboard that contains the two-char piece type strings.
+
+       RETURNS:
+        (float) on the open set [0.0, 1.0]; to what extent is this position an endgame? 0.0 --> only King and Pawns.
+    """
+    phase_score = 0.0
+    for r in range(len(b)):
+        for c in range(len(b[r])):
+            piece = b[r][c]
+            if piece != "--":
+                phase_score += PHASE_WEIGHTS.get(piece[1], 0)  ## Add either the correct phase weight or zero.
+
+    ## Clamp to open set [0, TOTAL_PHASE] before normalizing; otherwise, pawn-promos would make this value exceed 1.0.
+    return min(phase_score, TOTAL_PHASE_SCORE) / TOTAL_PHASE_SCORE
+
+
+def _evaluate_pawn_structure(b) -> int:
+    """
+       Evaluates positional strengths/weaknesses in pawn structure. Returns score in centipawns; positive favors white.
+        Considers:
+            (a) DOUBLED pawns (two friendly-pawns on same file);
+            (b) ISOLATED pawns (pawns with no friendly-pawns both adjacent files);
+            (c) PASSED pawns (pawns with no enemy pawns blocking its advance or guarding its promotion-square).
+
+       PARAMETERS:
+        b (gs.board, list[list[str]]): the 8x8 chessboard that contains the two-char piece type strings.
+
+       RETURNS:
+        (int) score in centipawns; positive favors white.
+    """
+    score = 0
+
+    """
+       THREE-PASS approach:
+        1. record which rows/cols contain pawns of each color;
+        2. white_pawns_on_col[c] = list of row indices where white has a pawn on col "c";
+        3. black_pawns_on_col[c] = likewise for black.
+    """
+    white_pawns_on_col = [[] for _ in range(8)]
+    black_pawns_on_col = [[] for _ in range(8)]
+
+    ## First pass.
+    for r in range(len(b)):
+        for c in range(len(b[r])):
+            piece = b[r][c]
+            if piece == "wP":
+                white_pawns_on_col[c].append(r)
+            elif piece == "bP":
+                black_pawns_on_col[c].append(r)
+
+    ## Second pass: evaluating bonus/penalty for WHITE's pawn-structure.
+    for c in range(len(b)):
+        wp = white_pawns_on_col[c]
+        if not wp:
+            continue
+
+        ## Scoring DOUBLED white pawns.
+        if len(wp) > 1:
+            score += DOUBLED_PAWN_PENALTY * (len(wp) - 1)
+
+        for r in wp:
+            ## Scoring ISOLATED white pawns.
+            has_neighbor = False
+            if (c>0) and (white_pawns_on_col[c-1]):
+                has_neighbor = True
+            if (c<7) and (white_pawns_on_col[c+1]):
+                has_neighbor = True
+            if not has_neighbor:
+                score += ISOLATED_PAWN_PENALTY
+
+            ## Scoring PASSED white pawns.
+            is_passed = True
+            """
+               "scan_c" is the range of columns we are scanning; either 2 or 3 columns:
+                (a) if c is between 1 and 6, then "scan_c" starts one col left of c and ends one col right of c;
+                (b) if c==0 or c==7 (edge), then "scan_c" includes c and whichever col on the board borders it.
+               "enemy_r": Inside the column "scan_c", are there any pawns? Are any of these pawns CLOSER to your pawn's
+                "promotion-square" than your pawn? If so, then your pawn is NOT "passed"; if not, then it is "passed".
+            """
+            for scan_c in range(max(0, c-1), min(8, c+2)):
+                for enemy_r in black_pawns_on_col[scan_c]:  ## Are there any enemy pawns on row "enemy_r"?
+                    if enemy_r < r:  ## Black pawn IS ahead of this white pawn: NOT passed!
+                        is_passed = False
+                        break
+                if not is_passed:
+                    break
+            if is_passed:
+                ## Converting ranks to rows: in the case of white, this is 7-row.
+                rank = 7 - r
+                score += PASSED_PAWN_BONUS[rank]
+
+    ## Third pass: evaluating bonus/penalty for BLACK's pawn-structure.
+    for c in range(len(b)):
+        bp = black_pawns_on_col[c]
+        if not bp:
+            continue
+
+        ## Scoring DOUBLED black pawns.
+        if len(bp) > 1:
+            ## The penalty is already negative; we subtract the negative because "bad for black" is "good for white."
+            score -= DOUBLED_PAWN_PENALTY * (len(bp) - 1)
+
+        for r in bp:
+            ## Scoring ISOLATED black pawns.
+            has_neighbor = False
+            if (c>0) and (black_pawns_on_col[c-1]):
+                has_neighbor = True
+            if (c<7) and (black_pawns_on_col[c+1]):
+                has_neighbor = True
+            if not has_neighbor:
+                score -= ISOLATED_PAWN_PENALTY
+
+            ## Scoring PASSED black pawns.
+            is_passed = True
+            for scan_c in range(max(0, c-1), min(8, c+2)):
+                for enemy_r in white_pawns_on_col[scan_c]:  ## Are there any enemy pawns on row "enemy_r"?
+                    if enemy_r > r:  ## Black pawn IS ahead of this white pawn: NOT passed!
+                        is_passed = False
+                        break
+                if is_passed:
+                    ## Converting ranks to rows: in the case of black, this is row.
+                    rank_from_black = r
+                    score -= PASSED_PAWN_BONUS[rank_from_black]
+
+    return score
+
+
+def _evaluate_bishop_pair(b):
+    """
+       Awards a bonus to a team that still has both of its Bishops.
+        A Bishop-pair can control any square of the 64 squares on the board.
+       NOTE: the bishops MUST control opposite-colored squares in order for the team to receive the bonus!
+        Obviously, if a team has one or more Bishops on the same color, one only controls half (32) of the squares!
+
+       PARAMETERS:
+        b (gs.board, list[list[str]]): the 8x8 chessboard that contains the two-char piece type strings.
+
+       RETURNS:
+        (int) BONUS score in centipawns; positive favors white.
+    """
+    ## Defining booleans to see whether a side (white/black) has which (light/dark) bishop.
+    white_has_light_bishop = False
+    white_has_dark_bishop  = False
+    black_has_light_bishop = False
+    black_has_dark_bishop  = False
+
+    ## Searching the board; optionally setting the bishop-bools to True.
+    for r in range(len(b)):
+        for c in range(len(b[r])):
+            piece = b[r][c]
+
+            if piece == "wB":
+                ## Bottom-right: always-light! Same with top-left, and every square in-between!
+                if not (r+c) % 2:
+                    white_has_light_bishop = True
+                else:
+                    white_has_dark_bishop = True
+
+            elif piece == "bB":
+                if not (r+c) % 2:
+                    black_has_light_bishop = True
+                else:
+                    black_has_dark_bishop = True
+
+    ## Adding bonus ONLY IF a given side has Bishops on BOTH LIGHT AND DARK squares!
+    bonus = 0
+    if white_has_light_bishop and white_has_dark_bishop:
+        bonus += BISHOP_PAIR_BONUS
+    if black_has_light_bishop and black_has_dark_bishop:
+        bonus -= BISHOP_PAIR_BONUS
+
+    return bonus
+
+
+def _evaluate_rook_file_openness(b):
+    """
+       Awards a large bonus to a team with rooks on open files; smaller bonus to a team with rooks on semi-open files.
+        The deeper a rook can see into the enemy position, the more squares it controls; the more powerful it becomes.
+
+       PARAMETERS:
+        b (gs.board, list[list[str]]): the 8x8 chessboard that contains the two-char piece type strings.
+
+       RETURNS:
+        (int) BONUS score in centipawns; positive favors white.
+    """
+    bonus = 0
+
+    ## Start by assuming there are no pawns of any color on any column.
+    white_pawns_on_col = [False] * 8
+    black_pawns_on_col = [False] * 8
+
+    ## Figure out which files have pawns on them (also which color).
+    for r in range(len(b)):
+        for c in range(len(b[r])):
+            piece = b[r][c]
+
+            if piece == "wP":
+                white_pawns_on_col[c] = True
+            elif piece == "bP":
+                black_pawns_on_col[c] = True
+
+    ## Figure out which files have rooks on them (also which color); thus award bonuses.
+    for r in range(len(b)):
+        for c in range(len(b[r])):
+            piece = b[r][c]
+
+            if piece == "wR":
+                if (not white_pawns_on_col[c]) and (not black_pawns_on_col[c]):
+                    bonus += ROOK_OPEN_FILE_BONUS  ## NO PAWNS AT ALL on this file!
+                elif not white_pawns_on_col[c]:
+                    bonus += ROOK_SEMI_OPEN_FILE_BONUS  ## NO FRIENDLY PAWNS on this, but there is/are enemy pawn/s.
+
+            elif piece == "bR":
+                if (not white_pawns_on_col[c]) and (not black_pawns_on_col[c]):
+                    bonus += ROOK_OPEN_FILE_BONUS
+                elif not black_pawns_on_col[c]:
+                    bonus += ROOK_SEMI_OPEN_FILE_BONUS
+
+    return bonus
+
+#######################################################################################################################
 
 ## Preferred-method: if there is a "best" move, then this returns a max-score.
 def evaluate(gs: GameState) -> int:
@@ -594,7 +882,7 @@ def evaluate(gs: GameState) -> int:
         gs (GameState object): the "object of analysis" (may not be the CURRENT version, as displayed on the screen).
 
        RETURN:
-        Integer score in centipawns; positive is good for whomever's turn it is to move.
+        (int) score in centipawns; positive is good for whomever's turn it is to move.
     """
     ## First, check for mates on the board!
     if gs.checkmate:
@@ -602,11 +890,18 @@ def evaluate(gs: GameState) -> int:
     elif gs.stalemate:
         return STALEMATE  ## The game is a draw.
 
+    b = gs.board
+
+    ## Compute the game's "phase score:" 1.0 is pure opening/middlegame; 0.0 is "pure endgame" (only Kings and pawns).
+    phase_score = _compute_game_phase(b=b)
+
     ## If there is NO mate on the board, then run the algorithm to score a possible position!
+    ##  Now including TAPERING (blending the endgame in slowly)!
     score = 0
 
-    for r in range(8):      ## 8 rows.
-        for c in range(8):  ## 8 cols.
+    ## TAPER: blend middlegame and endgame.
+    for r in range(len(b)):
+        for c in range(len(b[r])):
             piece = gs.board[r][c]
 
             ## Neglect the irrelevant empty squares.
@@ -617,13 +912,32 @@ def evaluate(gs: GameState) -> int:
             piece_color = piece[0]
             piece_type = piece[1]
 
-            row_idx = r if piece_color == "w" else 7 - r  ## The row-numbers flip when we change display-perspectives.
-            addend = PIECE_SCORES[piece_type] + PST[piece_type][row_idx][c]
+            ## The row-numbers flip when we change display-perspectives.
+            row_idx = r if piece_color == "w" else 7 - r
+            material_bonus = PIECE_SCORES[piece_type]
 
-            score += addend if piece_color == "w" else -addend  ## Add score for White, substract score for Black.
+            ## TAPER IN a King-scoring table.
+            if piece_type == "K":
+                mg_king_pst = KING_TABLE[row_idx][c]
+                eg_king_pst = ENDGAME_KING_TABLE[row_idx][c]
+                positional_bonus = (phase_score * mg_king_pst) + ((1 - phase_score) * eg_king_pst)
+            else:
+                positional_bonus = PST[piece_type][row_idx][c]
+
+            addend = material_bonus + positional_bonus
+            score += addend if piece_color == "w" else -addend
+
+    ## Evaluate PAWN STRUCTURE.
+    score += _evaluate_pawn_structure(b=b)
+
+    ## Evaluate BISHOP PAIRS.
+    score += _evaluate_bishop_pair(b=b)
+
+    ## Evaluate ROOK FILE-OPENNESS.
+    score += _evaluate_rook_file_openness(b=b)
 
     ## Flip the sign to reflect the perspective of whomever's turn it is to move.
-    return score if gs.white_to_move else -score
+    return int(score) if gs.white_to_move else int(-score)
 
 
 ## Quiescence-search: a better way to handle "quiet" moves (that searches until the state is "quiet").
@@ -746,6 +1060,9 @@ def get_move_nega_max_with_alpha_beta_pruning(
             elif (tt_entry.flag == TT_BETA) and (tt_entry.score >= beta):
                 return beta
 
+    ## Safety net: if we have recursed too deep (runaway check extensions), then bubble up the result automatically.
+    if ply >= MAX_PLY:
+        return evaluate(gs=gs)
 
     ## Base-case: at the horizon/leaf node, return the quiescence search results.
     if depth <= 0:
@@ -775,7 +1092,8 @@ def get_move_nega_max_with_alpha_beta_pruning(
 
         ## 2. Make, then score, finally undo that move.
         gs.make_move(m)
-        extension = 1 if gs.current_player_is_in_check else 0  ## Extend if in check...
+        ## Below: only extend if in check AND BELOW the max-ply-depth!
+        extension = 1 if (gs.current_player_is_in_check and (ply + depth < MAX_PLY - 1)) else 0
         score = -get_move_nega_max_with_alpha_beta_pruning(
             gs=gs, depth=depth-1+extension,
             alpha=-beta, beta=-alpha, ply=ply+1,
