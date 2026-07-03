@@ -24,7 +24,7 @@ To play the game:
 - To go back to promoting to a QUEEN, press the "ENTER" key.
 
 Playing as white/black versus a human/AI --- Setting boolean variables in ChessMain.py:
-- To set up a game between TWO HUMANS, set "human_player_white = True" and "human_player_black = True" in the file ChessAI.py;
+- To set up a game between TWO HUMANS, set "human_player_white = True" and "human_player_black = True" in the file ChessAI.py.
 - To set up a game between ONE HUMAN AND AI, set either boolean to False, depending on which piece color you want to play as a human.
 - To set up an onslaught of AI VERSUS AI, set both booleans to False.
 
