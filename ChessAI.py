@@ -1,13 +1,13 @@
 """
    By Paul Robert Andreini
-    18 May 2026
+    30 June 2026
 
    Code here is LOOSELY based on a YouTube tutorial series, whose playlist is visible at the following link:
         https://www.youtube.com/playlist?list=PLBwF487qi8MGU81nDGaeNE1EnNEPYWKY_
    Although, now, we will be going beyond this tutorial (still leaving the link here for posterity).
     We will now implement a much faster AND more-accurate algorithm --- on the "Stockfish" engine, (state-of-the-art).
 
-   This code is for EPISODE 24.
+   This code is for EPISODE 25.
 
    ###########################################################################
 
@@ -62,6 +62,13 @@ STALEMATE = 0  ## Stalemate is better than losing (= -CHECKMATE), but a draw is 
 MAX_DEPTH = 5  ## Iterative deepening will search from depth 1 up to this value.
 MAX_PLY = 64   ## Hard limit on search-depth to prevent runaway check-extensions.
 MAX_KILLER_TABLE_SIZE = 64  ## Must exceed the deepest ply reachable by search + quiescence.
+
+"""
+   Defining constants related to NULL-MOVES: when you make a move that is so good that, even if you skip your next
+    turn, your opponent couldn't possibly score better than you.
+"""
+NULL_MOVE_REDUCTION = 2  ## Number of plies "shaved off" when searching for a null-move (2 is safe; 3 is aggressive).
+MIN_NULL_MOVE_DEPTH = 3  ## Do not bother pruning null-moves beyond this remaining depth.
 
 ####################
 
@@ -1018,13 +1025,53 @@ def quiescence(gs: GameState, alpha: int, beta: int) -> int:
     return alpha
 
 
+def _make_null_move(gs: GameState):
+    """
+       Peforms a NULL-MOVE: the player-to-move "passes", thereby handing his/her opponent a free-move.
+        We flip the turn; clear en-passant targets (en-passant happens IMMEDIATELY; passing forfeits the opportunity.)
+        This function RETURNS the "saved en-passant target" (saved_ep_target) so that _undo_null_move can restore it.
+    """
+    gs.white_to_move = not gs.white_to_move
+    saved_ep_target = gs.en_passant_possible
+    gs.en_passant_possible = ()
+
+    return saved_ep_target
+
+
+def _undo_null_move(gs: GameState, saved_ep_target) -> None:
+    """
+       Reverses the function _make_null_move(...). Flips the turn back and restores the en-passant target.
+    """
+    gs.white_to_move = not gs.white_to_move
+    gs.en_passant_possible = saved_ep_target
+
+
+def _player_has_non_pawn_material(gs: GameState) -> bool:
+    """
+       Serves as a guard against zugzwang. Returns True iff the current player has at least one N/B/R/Q on the board.
+        In King-and-pawn endgames, "passing" is often better than any valid move on the board, so "naïve" null-move
+        pruning produces false-cutoffs (zugzwang); thus, we disable null-move pruning in the case that this is True.
+    """
+    color = "w" if gs.white_to_move else "b"
+    for r in range(len(gs.board)):
+        for c in range(len(gs.board[r])):
+            if gs.board[r][c] != "--":
+                piece = gs.board[r][c]
+                if piece[0] == color:
+                    return True
+
+    ## If we reach this point in the code, then the current player has nothing but a King and (potentially) pawns.
+    return False
+
+
 ## Updated nega-max method, with alpha/beta pruning, considering our above-defined constants and functions.
 def get_move_nega_max_with_alpha_beta_pruning(
         gs: GameState,
         depth: int, alpha: int, beta: int, ply: int,
         orderer: MoveOrderer,
         tt: TranspositionTable,
-        zobrist: ZobristHasher
+        zobrist: ZobristHasher,
+        allow_null: bool = True
     ) -> int:
     """
        NegaMax with alpha-beta pruning, killer moves, and history heuristic.
@@ -1038,7 +1085,8 @@ def get_move_nega_max_with_alpha_beta_pruning(
         ply (int):   distance from the root (0 at root, increments each recursive call);
         orderer (MoveOrderer): shared object that tracks killers and history;
         tt (TranspositionTable): the transposition table;
-        zobrist (ZobristHasher): the ZobristHasher object.
+        zobrist (ZobristHasher): the ZobristHasher object;
+        allow_null (bool): allow null-move pruning from this GameState object (this is not always True).
 
        RETURNS:
         Integer score in centipawns; positive is good for whomever's turn it is to move.
@@ -1078,6 +1126,31 @@ def get_move_nega_max_with_alpha_beta_pruning(
         return -(CHECKMATE - ply)
     if gs.stalemate:
         return STALEMATE
+
+    ## Capture this node's check-status NOW, before it is obliterated by a deeper-search.
+    current_player_is_in_check = gs.current_player_is_in_check
+
+    ## Null-move pruning happens here...
+    if (allow_null
+            and (depth >= MIN_NULL_MOVE_DEPTH)
+            and (not current_player_is_in_check)
+            and (_player_has_non_pawn_material(gs=gs))):
+        saved_ep_target = _make_null_move(gs=gs)
+        null_score = -get_move_nega_max_with_alpha_beta_pruning(
+            gs=gs,
+            depth=depth - 1 - NULL_MOVE_REDUCTION,
+            alpha=-beta, beta=-beta, ply=ply+1,
+            orderer=orderer, tt=tt, zobrist=zobrist,
+            allow_null=False  ## NEVER two null-passes back-to-back; this is equivalent to both players not moving.
+        )
+        _undo_null_move(gs=gs, saved_ep_target=saved_ep_target)
+
+        ## CRUCIAL -- DO NOT FORGET!
+        ##  Currently, the search will override whether the current player is in check; restore this!
+        gs.current_player_is_in_check = current_player_is_in_check
+
+        if null_score > beta:
+            return beta
 
     ## Order the valid moves according to benefit to the side whose turn it is to move, using the MoveOrderer object.
     ##  TT-move, Captures, pawn-promotions, killers, history, in that order!
