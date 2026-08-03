@@ -772,66 +772,62 @@ class GameState:
 
     def search_for_material_stalemate(self):
         """
-           Searches for a stalemate based on the material on the board; there is a stalemate if:
-            (a) there are two lone Kings;
-            (b)   "    "   "    "    "    and either one or two knights (either color; Knights cannot force checkmate);
-            (c)   "    "   "    "    "    and only one Bishop (of either color; one Bishop cannot force checkmate).
-            (d)   "    "   "    "    "    and two Bishops of the same color on the same team.
+           Searches for a draw based on insufficient material.
+            It is a draw if NEITHER side has enough material to force a checkmate.
+
+           This is true in EXACTLY FOUR CASES:
+            (a) K vs. K;
+            (b) K + ONE minor piece (either N OR B) vs. K;
+            (c) K + TWO N vs. K;
+            (d) K + Bishop(s) vs. K + Bishop(s); ALL Bishops on the same-color square (neither side can force mate).
+
+           NOTE: K + N + B vs. K is EMPHATICALLY NOT an automatic-draw; it may be a greuling grind, but such a
+            checkmate IS possible.
         """
         stalemate = False
         active_pieces = []
 
-        for r in range(8):
-            for c in range(8):
+        """
+           Stores the "parity", P := (r + c) % 2, for any and all Bishops currently on the board.
+            NOTE: Because we compute P "mod 2", every square yields a value in the set {0, 1}.
+                  Since integers are "hashable", the "set(...)" function can collapse duplicates, so the resultant set
+                  is ALWAYS in {{0}, {1}, {0, 1}}; only in the LAST case (both colors present) can the game continue.
+        """
+        bishop_parity = []  ## Lists the parities of all active B; if this is not {0, 1}, then the game ends in a draw.
+
+        for r in range(len(self.board)):
+            for c in range(len(self.board[r])):
+                sq = self.board[r][c]
 
                 ## Ignore the Kings and empty spaces; only record "nontrivial" pieces.
                 if not ((self.board[r][c][1] == "K") or (self.board[r][c] == "--")):
-                    active_pieces.append(self.board[r][c])
+                    active_pieces.append(sq)
 
-        ## If there are ZERO non-King active-pieces, then this is stalemate!
-        if len(active_pieces) == 0:
+                    ## If there is a BISHOP on this square, then note its parity; append to our "bishop_parity" list.
+                    if sq[1] == "B":
+                        bishop_parity.append((r + c) % 2)
+
+        num_active_pieces = len(active_pieces)
+
+        ## CASE (a): NO active pieces (two lone-Kings).
+        if num_active_pieces == 0:
             stalemate = True
 
-        ## If there is ONLY ONE non-King active-piece, then we potentially have stalemate...
-        elif len(active_pieces) == 1:
-            active_piece = active_pieces[0]
-
-            ##  ...so long as that piece is a kNight or a Bishop.
-            if (active_piece[1] == "N") or (active_piece[1] == "B"):
+        ## CASE (b): a SINGLE minor-piece (N or B).
+        elif num_active_pieces == 1:
+            if active_pieces[0][1] in ("N", "B"):
                 stalemate = True
 
-        ## If there are TWO non-King active-pieces, then we must think harder.
-        ##  If ONE player has BOTH Bishops, then it is NOT stalemate (unless they are both on the same color-square);
-        ##  if, instead, either player has either one bishop, one knight, or two knights, then it IS stalemate!
-        elif len(active_pieces) == 2:
-            if (all([j == "bB" for j in active_pieces])) or (all([j == "wB" for j in active_pieces])):
+        elif num_active_pieces == 2:
 
-                ## Code here for two bishops: same-color, same-team.
-                parity_1st_bishop = 0
-                first_bishop_found = False
-                parity_2nd_bishop = 0
+            ## CASE (c): TWO Knights cannot force checkmate.
+            if all(j == "wN" for j in active_pieces) or all(j == "bN" for j in active_pieces):
+                stalemate = True
 
-                ## Looping through the board looking for the parity for each Bishop.
-                for r in range(8):
-                    for c in range(8):
-                        if self.board[r][c][1] == "B":
-                            if not first_bishop_found:
-                                parity_1st_bishop = r + c
-                                first_bishop_found = True
-                            else:
-                                parity_2nd_bishop = r + c
-
-                ## Setting stalemate-condition:
-                if ((parity_1st_bishop + parity_2nd_bishop) % 2) == 0:
+            ## CASE (d): ANY NUMBER of same-square-color Bishops cannot force checkmate.
+            elif all(j[1] == "B" for j in active_pieces):
+                if len(set(bishop_parity)) == 1:
                     stalemate = True
-                else:
-                    stalemate = False
-
-            elif (all([j[1] == "B" for j in active_pieces])
-                  and (any([j[0] == "w" for j in active_pieces]) and any(j[0] == "b" for j in active_pieces))):
-                stalemate = True
-            elif (all([j == "wN" for j in active_pieces])) or (all([j == "bN" for j in active_pieces])):
-                stalemate = True
 
         return stalemate
 
