@@ -1,13 +1,13 @@
 """
    By Paul Robert Andreini
-    30 June 2026
+    09 July 2026
 
    Code here is LOOSELY based on a YouTube tutorial series, whose playlist is visible at the following link:
         https://www.youtube.com/playlist?list=PLBwF487qi8MGU81nDGaeNE1EnNEPYWKY_
    Although, now, we will be going beyond this tutorial (still leaving the link here for posterity).
     We will now implement a much faster AND more-accurate algorithm --- on the "Stockfish" engine, (state-of-the-art).
 
-   This code is for EPISODE 25.
+   This code is for EPISODE 26.
 
    ###########################################################################
 
@@ -69,6 +69,18 @@ MAX_KILLER_TABLE_SIZE = 64  ## Must exceed the deepest ply reachable by search +
 """
 NULL_MOVE_REDUCTION = 2  ## Number of plies "shaved off" when searching for a null-move (2 is safe; 3 is aggressive).
 MIN_NULL_MOVE_DEPTH = 3  ## Do not bother pruning null-moves beyond this remaining depth.
+
+"""
+   Defining constants related to FUTILITY-PRUNING/RAZORING.
+    Indexed by remaining depth, each margin is the largest "swing" we expect a quiet move (or shallow search) to
+    plausibly produce.
+    Index 0 is not used (we never prune at the quiescence horizon); lists are sized for indices [0, 1, 2, 3].
+"""
+FUTILITY_MARGIN = [0, 100, 300, 500]  ## depth 1 --> pawn; depth 2 --> minor piece; depth 3 --> rook.
+MAX_FUTILITY_DEPTH = 3
+
+RAZOR_MARGIN = [0, 300, 500, 700]
+MAX_RAZOR_DEPTH = 3
 
 ####################
 
@@ -1057,7 +1069,7 @@ def _player_has_non_pawn_material(gs: GameState) -> bool:
         for c in range(len(gs.board[r])):
             if gs.board[r][c] != "--":
                 piece = gs.board[r][c]
-                if piece[0] == color:
+                if (piece[0] == color) and (piece[1] in ("N", "B", "R", "Q")):
                     return True
 
     ## If we reach this point in the code, then the current player has nothing but a King and (potentially) pawns.
@@ -1130,6 +1142,29 @@ def get_move_nega_max_with_alpha_beta_pruning(
     ## Capture this node's check-status NOW, before it is obliterated by a deeper-search.
     current_player_is_in_check = gs.current_player_is_in_check
 
+    """
+       STATIC-EVAL (lazy-method): razoring/futility-pruning BOTH need a STATIC-EVAL at THIS NODE.
+        We compute it ONCE, and ONLY when it can be actually used (i.e., at shallow nodes that are NOT in check), ...
+        ... to avoid paying the computational-time cost of running "evaluate()" deep in the tree.
+    """
+    static_eval = None
+    if (not current_player_is_in_check) and (depth <= max(MAX_RAZOR_DEPTH, MAX_FUTILITY_DEPTH)):
+        static_eval = evaluate(gs=gs)
+
+    """
+       RAZORING:
+        At shallow-depth, if even a generous margin above the static-eval cannot reach alpha, then this position is ...
+        ... probably hopeless. Confirm with a quiescence-search; if it STILL fails-low, then prune the entire node!
+        GUARDS: NEVER razor while in check or near mate-scores (those require an exact search).
+    """
+    if ((static_eval is not None)
+            and (depth <= MAX_RAZOR_DEPTH)
+            and (abs(alpha) < CHECKMATE - MAX_PLY)
+            and (static_eval + RAZOR_MARGIN[depth] <= alpha)):
+        q_score = quiescence(gs=gs, alpha=alpha, beta=beta)
+        if q_score <= alpha:
+            return q_score
+
     ## Null-move pruning happens here...
     if (allow_null
             and (depth >= MIN_NULL_MOVE_DEPTH)
@@ -1160,13 +1195,37 @@ def get_move_nega_max_with_alpha_beta_pruning(
     max_score = -CHECKMATE - 1  ## Start with the worst-possible score; try to increase it.
     best_move = vm_list[0] if vm_list else None  ## Track the best move for TT storage.
 
+    ## Pre-compute whether futility-pruning is even allowed at this node (a cheap "gate" for the loop, below!).
+    futility_allowed = (
+        (static_eval is not None)
+        and (depth <= MAX_FUTILITY_DEPTH)
+        and (abs(alpha) < CHECKMATE - MAX_PLY)
+    )
+
     ## 1. Loop through all the valid moves we just created.
-    for m in vm_list:
+    for move_index, m in enumerate(vm_list):
+        is_quiet = (m.piece_captured[0] == "-") and (not m.is_pawn_promotion)
 
         ## 2. Make, then score, finally undo that move.
         gs.make_move(m)
+        gives_check = gs.current_player_is_in_check
+
+        """
+           FUTILITY PRUNING:
+            At frontier-nodes, skip quiet, non-checking moves that cannot realistically lift alpha.
+            We ALWAYS search the "first" (best-ordered) move -- move_index > 0 -- so the node never returns None, ...
+            ... and we ALWAYS keep captures, promotions, and check-moves, as these can swing the eval quite sharply!
+        """
+        if (futility_allowed
+                and is_quiet
+                and (not gives_check)
+                and (move_index > 0)
+                and (static_eval + FUTILITY_MARGIN[depth] <= alpha)):
+            gs.undo_move()
+            continue
+
         ## Below: only extend if in check AND BELOW the max-ply-depth!
-        extension = 1 if (gs.current_player_is_in_check and (ply + depth < MAX_PLY - 1)) else 0
+        extension = 1 if (gives_check and (ply + depth < MAX_PLY - 1)) else 0
         score = -get_move_nega_max_with_alpha_beta_pruning(
             gs=gs, depth=depth-1+extension,
             alpha=-beta, beta=-alpha, ply=ply+1,
