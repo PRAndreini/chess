@@ -411,8 +411,18 @@ def main():
 
                 ## UNDO when 'Z' key is pressed.
                 if e.key == p.K_z:
+                    """
+                       Only printing "Undoing the most-recent move!" if the move log as a POSITIVE LENGTH!
+                        Previously, if you open a new game and spam 'Z', it would say this message even though no ...
+                        ... moves had yet been made.
+                        Now, it will say "No moves have been made!" in this case.
+                    """
+                    if len(gs.move_log) > 0:
+                        print("Undoing the most-recent move!")
+                    else:
+                        print("No moves have been made!")
+
                     gs.undo_move()
-                    print("Undoing the most-recent move!")
                     move_made = True
                     animated = False
                     ## Without the line below, if mate is achieved, and then undo, next time mate happens the ...
